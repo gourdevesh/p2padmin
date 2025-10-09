@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { Search, Bell, User, Menu, LogOut, Key, Settings } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { logOutUser } from "../services/AdminService";
+import { showToast } from "../utils/toast";
 
 interface NavbarProps {
   onToggleSidebar: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
-  const { admin, logout } = useAuth();
+  const { admin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate()
@@ -22,6 +24,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+const logout = async () => {
+  try {
+    const res = await logOutUser();
+
+    if (res?.status) { // ✅ use status instead of success
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      showToast("success", "Logged out successfully");
+      navigate("/login"); // ✅ this will now run
+    } else {
+      console.error("Logout failed:", res);
+    }
+  } catch (error) {
+    console.error("Error during logout:", error);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    navigate("/login");
+  }
+};
+
+
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Plus, AlertTriangle, Clock, CheckCircle, Eye, MessageCircle, User, MoreHorizontal } from 'lucide-react';
 import { Table } from '../components/Table';
 import { Dispute } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 const mockDisputes: Dispute[] = [
   {
@@ -67,6 +68,7 @@ export const Disputes: React.FC = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const filteredDisputes = mockDisputes.filter(dispute => {
     const matchesSearch = dispute.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,6 +133,8 @@ export const Disputes: React.FC = () => {
 
   const handleDisputeAction = (disputeId: string, action: string) => {
     console.log(`Action: ${action} for dispute: ${disputeId}`);
+navigate('/dispute-details');
+    // Implement action handling logic here (e.g., navigate to detail page, open modal, etc.)
   };
 
   const columns = [

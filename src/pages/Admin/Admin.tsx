@@ -94,31 +94,39 @@ export const Admin: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Admin
         </h1>
-      <div className="flex items-center space-x-3">
- <div className="flex items-center space-x-2 flex-1">
-  <label
-    htmlFor="role"
-    className="text-lg font-medium text-gray-700 dark:text-gray-300"
-  >
-    Role:
-  </label>
-  <select
-    id="role"
-    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    value={role}
-    onChange={(e) => {
-      setCurrentPage(1); // ✅ reset page when role changes
-      setRole(e.target.value);
-    }}
-  >
-    <option value="">Select Role</option>
-    <option value="admin">Admin</option>
-    <option value="sub_admin">Sub Admin</option>
-    <option value="super_admin">Super Admin</option>
-  </select>
-</div>
+     <div className="flex items-center space-x-3">
+        {/* Role Select */}
+        <div className="flex items-center space-x-2">
+          <label
+            htmlFor="role"
+            className="text-lg font-medium text-gray-700 dark:text-gray-300"
+          >
+            Role:
+          </label>
+          <select
+            id="role"
+            className="p-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={role}
+            onChange={(e) => {
+              setCurrentPage(1); // ✅ reset page when role changes
+              setRole(e.target.value);
+            }}
+          >
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="sub_admin">Sub Admin</option>
+            <option value="super_admin">Super Admin</option>
+          </select>
+        </div>
 
-</div>
+        {/* Add Admin Button */}
+        <button
+          onClick={() => navigate("/add-admin")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Add Admin
+        </button>
+      </div>
 
       </div>
 
