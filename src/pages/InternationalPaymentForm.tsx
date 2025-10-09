@@ -1,11 +1,14 @@
 // InternationalPaymentForm.tsx
+import { ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const countries = ["United States", "United Kingdom", "India", "Canada", "Australia"];
 const currencies = ["USD", "EUR", "INR", "GBP", "AUD"];
 const accountTypes = ["BUSINESS", "PERSONAL"];
 
 const InternationalPaymentForm: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     country: "",
     currency: "",
@@ -38,8 +41,26 @@ const InternationalPaymentForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">International Payment</h2>
+       <>
+      <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white ">
+International Payment
+        </h1>
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+            text-gray-800 dark:text-gray-200 font-medium 
+            rounded-md shadow-sm border border-gray-300 dark:border-gray-600
+            hover:bg-gray-200 dark:hover:bg-gray-600 
+            transition-colors duration-200 focus:outline-none focus:ring-2 
+            focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
+        >
+          <ArrowLeft className="mr-2 w-4 h-4" />
+          Back
+        </button>
+      </div>
+
+    <div className="max-w-xxl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mt-7">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Country */}
         <div>
@@ -174,6 +195,7 @@ const InternationalPaymentForm: React.FC = () => {
         </button>
       </form>
     </div>
+    </>
   );
 };
 

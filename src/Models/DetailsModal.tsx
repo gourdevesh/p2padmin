@@ -11,7 +11,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, onClose, data }) =>
     console.log("data", data);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 overflow-y-auto p-2 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 overflow-y-auto p-2 sm:p-4:dark:bg-black dark:bg-opacity-70">
             <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 font-sans p-4 sm:p-6">
 
                 {/* Header */}

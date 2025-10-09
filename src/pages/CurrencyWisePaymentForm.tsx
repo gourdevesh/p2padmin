@@ -27,7 +27,6 @@ const CurrencyWisePaymentForm = () => {
       </div>
 
       <div className="max-w-xxl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 mt-7">
-        {/* Select Currency */}
         <label className="block mb-2 text-gray-700 dark:text-gray-300">
           Select Currency
         </label>
@@ -48,28 +47,28 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="text"
               placeholder="Enter Bank Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Account Holder Name*</label>
             <input
               type="text"
               placeholder="Enter Account Holder Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Account Number*</label>
             <input
               type="text"
               placeholder="Enter Account Number"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">IFSC Code*</label>
             <input
               type="text"
               placeholder="Enter IFSC Code"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             {/* Percent Charge */}
@@ -77,7 +76,7 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="number"
               placeholder="Enter percent charge"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
           </div>
         )}
@@ -88,35 +87,35 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="text"
               placeholder="Enter Bank Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Account Holder Name*</label>
             <input
               type="text"
               placeholder="Enter Account Holder Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Account Number*</label>
             <input
               type="text"
               placeholder="Enter Account Number"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Routing Number*</label>
             <input
               type="text"
               placeholder="Enter Routing Number (ABA)"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">SWIFT Code (Optional)</label>
             <input
               type="text"
               placeholder="Enter SWIFT Code"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             {/* Percent Charge */}
@@ -124,7 +123,7 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="number"
               placeholder="Enter percent charge"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
           </div>
         )}
@@ -135,28 +134,28 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="text"
               placeholder="Enter Bank Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">Account Holder Name*</label>
             <input
               type="text"
               placeholder="Enter Account Holder Name"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">IBAN*</label>
             <input
               type="text"
               placeholder="Enter IBAN"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             <label className="block mb-2">SWIFT / BIC Code*</label>
             <input
               type="text"
               placeholder="Enter SWIFT / BIC Code"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
 
             {/* Percent Charge */}
@@ -164,7 +163,7 @@ const CurrencyWisePaymentForm = () => {
             <input
               type="number"
               placeholder="Enter percent charge"
-              className="w-full mb-4 p-2 border rounded-md"
+              className="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
             />
           </div>
         )}

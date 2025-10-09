@@ -17,11 +17,11 @@ const DeleteModal: React.FC<ModalProps> = ({
 }) => {
     return (
         <div
-            className={`fixed inset-0 flex items-start justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+            className={`fixed inset-0 flex items-start justify-center z-50 bg-black bg-opacity-50 transition-opacity  duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
         >
             <div
-                className={`bg-white rounded-lg shadow-lg w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] mt-10 p-4 sm:p-6 transform transition-all duration-500 ease-out ${isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0"
+                className={`bg-white rounded-lg shadow-lg w-[90%]  bg-white dark:bg-gray-800  sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] mt-10 p-4 sm:p-6 transform transition-all duration-500 ease-out ${isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0"
                     }`}
             >
                 {/* Header */}
@@ -31,15 +31,15 @@ const DeleteModal: React.FC<ModalProps> = ({
                     </h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 mx-4 sm:mx-6 text-[16px]"
+                        className="text-gray-500 hover:text-gray-700  dark:text-white mx-4 sm:mx-6 text-[16px]"
                     >
                         ✕
                     </button>
                 </div>
 
                 {/* Message */}
-                <div className="mb-4 border-b pb-4 -mx-4 sm:-mx-6">
-                    <p className="text-gray-600 mx-4 sm:mx-6 text-[14px] sm:text-[15px]">
+                <div className="mb-4 border-b pb-4 -mx-4 sm:-mx-6 dark:text-white"> 
+                    <p className="text-gray-600 mx-4 sm:mx-6 text-[14px] sm:text-[15px] dark:text-white">
                         {message}
                     </p>
                 </div>
