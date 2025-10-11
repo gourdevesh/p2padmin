@@ -115,10 +115,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
 
     // { id: 'users', label: 'Users', icon: 'Users', path: '/users' },
-    // { id: 'tradeHistory', label: 'Trade History', icon: 'Users', path: '/trade-history' },
+    { id: 'tradeHistory', label: 'Trade History', icon: 'Users', path: '/trade-history' },
     // { id: 'feedback', label: 'feed Back', icon: 'MessageCircle', path: '/feedback' },
 
-    // { id: 'transactions', label: 'Transactions', icon: 'ArrowRightLeft', path: '/transactions-details' },
+    { id: 'transactions', label: 'Transactions', icon: 'ArrowRightLeft', path: '/transactions-details' },
     { id: 'wallets', label: 'Wallets', icon: 'Wallet', path: '/wallet' },
     { id: 'disputes', label: 'Disputes', icon: 'MessageSquare', path: '/disputes' },
     {

@@ -6,6 +6,7 @@ import { decryptData } from "../../services/decryptService";
 import { getTradeHistory } from "../../services/TradeHistory";
 import PaymentUpdateStatusModel from "../../Models/PayemtUpdateStatusModel"; // If needed for update
 import UpdateUPIStatusModel from "../../Models/UpdateUPIStatusModel"; // Optional
+import CompleteTradeModal from "../../Models/CompleteRequestTradeModel";
 
 interface TradeType {
     trade_id: number;
@@ -86,6 +87,7 @@ const TradeHistory: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedData, setSelectedData] = useState<TradeType | null>(null);
 
+
     const handleUpdateClick = (row: TradeType) => {
         setSelectedData(row);
         setIsModalOpen(true);
@@ -135,6 +137,7 @@ const TradeHistory: React.FC = () => {
                 <button
                     type="button"
                     className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
+                    onClick={() => handleUpdateClick(row)}
                 >
                     Update
                 </button>
@@ -144,6 +147,13 @@ const TradeHistory: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <CompleteTradeModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={() => console.log("Trade completed!")}
+                selectedData={selectedData}
+            />
+
             <h2 className="font-bold text-lg mt-2">Trade History</h2>
 
             {/* Filters */}
@@ -228,12 +238,7 @@ const TradeHistory: React.FC = () => {
                 totalItems={tradeData.length}
             />
 
-            <UpdateUPIStatusModel
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                selectedData={selectedData}
-                onSuccess={fetchData}
-            />
+
         </div>
     );
 };

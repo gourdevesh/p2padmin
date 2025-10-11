@@ -51,6 +51,7 @@ import { VerificationDetails } from './pages/AdminVerificationDetails/Verificati
 import WebsideUpdateDetails from './pages/WebsideDetailsUpdate/WebsideUpdateDetails';
 import UpdateWebsiteLogoFavicon from './pages/WebsideDetailsUpdate/UpdateWebsiteLogoFavicon';
 import { ProtectedRoute } from './utils/ProtectedRoute';
+import TransactionsDetails from './pages/Transactions/TransactionDetails';
 
 function AppRoutes() {
   const location = useLocation();
@@ -86,6 +87,8 @@ function AppRoutes() {
           <Route path="/password-setting" element={<PasswordSetting />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/trade-history" element={<TradeHistory />} />
+          <Route path="/transactions-details" element={<TransactionsDetails />} />
+
 
 
 
