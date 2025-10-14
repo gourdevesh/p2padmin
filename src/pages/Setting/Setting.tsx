@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { decryptData } from "../../services/decryptService";
 import { getSettingData } from "../../services/SettingService";
 import { ArrowLeft } from "lucide-react";
+import { Button } from "@headlessui/react";
 interface TableRow {
   name: string;
   value: any;
@@ -24,19 +25,11 @@ export const Setting: React.FC = () => {
       if (!token) throw new Error("No auth token found");
 
       const res = await getSettingData(token);
-
       if (res?.data) {
         const decrypted = await decryptData(res.data, token);
-        if (decrypted?.data) {
-          const tableData = Object.keys(decrypted.data).map((key) => ({
-            name: key,
-            value: decrypted.data[key],
-          }));
-          setData(tableData);
-        } else {
-          setData([]);
-        }
-      } else {
+        setData(Array.isArray(decrypted?.data) ? decrypted.data : decrypted?.data ? [decrypted.data] : []);
+      }
+      else {
         setData([]);
       }
     } catch (err: any) {
@@ -53,26 +46,50 @@ export const Setting: React.FC = () => {
   }, []);
   console.log("data", data)
   const columns = [
-    { key: "name", label: "Setting", sortable: true },
-    { key: "value", label: "Value", sortable: true },
+    { key: "depositStatus", label: "depositStatus", sortable: true },
+    { key: "maxWithdraw", label: "maxWithdraw", sortable: true },
     {
-      key: "type",
-      label: "Type",
+      key: "user_registration",
+      label: "user_registration",
       sortable: true,
-      render: (_value: any, row: TableRow) => typeof row.value
     },
     {
-      key: "status",
-      label: "Status",
+      key: "withdrawType",
+      label: "withdrawType",
       sortable: true,
-      render: (_value: any, row: TableRow) => row.value === "enable" ? "Active" : "Inactive"
+    },
+
+    {
+      key: "trade_fee_type",
+      label: "trade_fee_type",
+      sortable: true,
     },
     {
-      key: "description",
-      label: "Description",
+      key: "withdrawStatus",
+      label: "withdrawStatus",
+      sortable: true,
+    },
+    {
+      key: "trade_fee",
+      label: "trade_fee",
       sortable: false,
-      render: (_value: any, row: TableRow) => `Configuration for ${row.name}`
     },
+
+    {
+      key: "action",
+      label: "Action",
+      sortable: false,
+      render: (_value: any, row: TableRow) => (
+        <button
+          type="button"
+          className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
+          onClick={() => navigate("/update-setting", { state: { rowData: row } })}
+        >
+          Update
+        </button>
+      ),
+    },
+
   ];
 
 

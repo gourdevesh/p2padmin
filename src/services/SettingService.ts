@@ -17,3 +17,22 @@ export const getSettingData = async (token: string,) => {
         throw new Error(msg);
     }
 };
+
+
+export const updateSettingData = async (token: string, formData: FormData) => {
+  try {
+    const { data } = await api.post(
+      "/setting/update-setting-data",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};

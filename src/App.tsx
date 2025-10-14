@@ -52,6 +52,10 @@ import WebsideUpdateDetails from './pages/WebsideDetailsUpdate/WebsideUpdateDeta
 import UpdateWebsiteLogoFavicon from './pages/WebsideDetailsUpdate/UpdateWebsiteLogoFavicon';
 import { ProtectedRoute } from './utils/ProtectedRoute';
 import TransactionsDetails from './pages/Transactions/TransactionDetails';
+import WalletDetails from './pages/WalletDetails';
+import UpdateSetting from './pages/Setting/UpdateSetting';
+import { FeedBack } from './pages/FeedBack/FeedBack';
+import CreateFeedBack from './pages/FeedBack/CreateFeedBack';
 
 function AppRoutes() {
   const location = useLocation();
@@ -88,6 +92,15 @@ function AppRoutes() {
           <Route path="/setting" element={<Setting />} />
           <Route path="/trade-history" element={<TradeHistory />} />
           <Route path="/transactions-details" element={<TransactionsDetails />} />
+          <Route path="/wallet-details" element={<WalletDetails />} />
+          <Route path="/update-setting" element={<UpdateSetting />} />
+          <Route path="/feedBack" element={<FeedBack />} />
+                    <Route path="/create-feedback" element={<CreateFeedBack />} />
+
+
+
+
+
 
 
 
