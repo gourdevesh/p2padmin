@@ -7,6 +7,7 @@ import { getTradeHistory } from "../../services/TradeHistory";
 import PaymentUpdateStatusModel from "../../Models/PayemtUpdateStatusModel"; // If needed for update
 import UpdateUPIStatusModel from "../../Models/UpdateUPIStatusModel"; // Optional
 import { getTransactionDetails } from "../../services/TransactionService";
+import { ArrowLeft } from "lucide-react";
 
 interface TradeType {
     trade_id: number;
@@ -172,7 +173,27 @@ const TransactionsDetails: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <h2 className="font-bold text-lg mt-2">Trade Transactions</h2>
+                <div className="flex flex-row items-center justify-between  flex-wrap">
+                                {/* Left side */}
+                                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            Trade Transactions
+                                </h1>
+                        
+                                {/* Right side */}
+                                <button
+                                  onClick={() => navigate(-1)}
+                                  className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+                               text-gray-800 dark:text-gray-200 font-medium 
+                               rounded-md shadow-sm border border-gray-300 dark:border-gray-600
+                               hover:bg-gray-200 dark:hover:bg-gray-600 
+                               transition-colors duration-200 focus:outline-none focus:ring-2 
+                               focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
+                                >
+                                  <ArrowLeft className="mr-2 w-4 h-4" />
+                                  Back
+                                </button>
+                              </div>
+            
 
             {/* Filters */}
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">

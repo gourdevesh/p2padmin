@@ -34,3 +34,45 @@ export const getVerificationDetails = async (token: string, query: string = "",)
         throw new Error(msg);
     }
 };
+
+export const updatEverifyAddress = async (token: string, body: { id: number; status: string; remark?: string }) => {
+    try {
+        const { data } = await api.post(
+            `/verification/verify-address`,
+            body,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return data;
+    } catch (error: any) {
+        const msg =
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to update payment status";
+        throw new Error(msg);
+    }
+};
+
+export const idVerificationDetails = async (token: string, body: { id: number; status: string; remark?: string }) => {
+    try {
+        const { data } = await api.post(
+            `/verification/verify-id`,
+            body,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return data;
+    } catch (error: any) {
+        const msg =
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to update payment status";
+        throw new Error(msg);
+    }
+};

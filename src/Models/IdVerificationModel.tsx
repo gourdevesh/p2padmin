@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { updatePaymentStatus, updateUpitStatus } from "../services/ManagePayment";
 import { showToast } from "../utils/toast";
-import { updatEverifyAddress } from "../services/AdminVerificationDetails";
+import { idVerificationDetails, updatEverifyAddress } from "../services/AdminVerificationDetails";
 
 interface BankDetailsModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface BankDetailsModalProps {
   onSuccess?: () => void;
 }
 
-const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
+const IdVerificationModel: React.FC<BankDetailsModalProps> = ({
   isOpen,
   onClose,
   selectedData,
@@ -25,7 +25,7 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
 
   useEffect(() => {
     if (isOpen && selectedData) {
-      setId(selectedData.addVer_id || 0);
+      setId(selectedData.address_id || 0);
       setStatus(selectedData.status || "pending");
       setRemark(selectedData.remark || "");
     }
@@ -40,9 +40,9 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
 
-      await updatEverifyAddress(token, { id, status, remark });
+      await idVerificationDetails(token, { id, status, remark });
 
-      showToast("success", "] status updated successfully!");
+      showToast("success", "updated successfully!");
       onSuccess?.();
       onClose();
     } catch (err: any) {
@@ -59,8 +59,8 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Address Verification
-\          </h2>
+            Id Verification
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl font-bold"
@@ -138,4 +138,4 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
   );
 };
 
-export default AdminVerifyAddressModel;
+export default IdVerificationModel;

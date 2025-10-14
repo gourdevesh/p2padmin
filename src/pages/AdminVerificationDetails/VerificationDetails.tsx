@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Table } from "../../components/Table";
 import {  getVerificationDetails } from "../../services/AdminVerificationDetails";
 import { showToast } from "../../utils/toast";
+import AdminVerifyAddressModel from "../../Models/AdminVerifyAddressModel";
+import IdVerificationModel from "../../Models/IdVerificationModel";
 
 export const VerificationDetails: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,6 +13,8 @@ export const VerificationDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+      const [selectedData, setSelectedData] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async (status: string = "", page: number = 1) => {
     try {
@@ -35,6 +39,15 @@ export const VerificationDetails: React.FC = () => {
   useEffect(() => {
     fetchData(statusFilter, currentPage);
   }, [currentPage, statusFilter]);
+     const handleUpdateClick = (row:any) => {
+    setSelectedData(row);
+    setIsModalOpen(true);
+  };
+    const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedData(null);
+  };
+
 
   const columns = [
     { key: "residence_country", label: "Country", sortable: true },
@@ -42,10 +55,33 @@ export const VerificationDetails: React.FC = () => {
     { key: "address_line1", label: "Address Line 1" },
     { key: "status", label: "Status", sortable: true },
     { key: "remark", label: "Remark" },
+       {
+      key: "actions",
+      label: "Actions",
+            render: (value: any, row: any) => (
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={() => handleUpdateClick(row)}
+
+
+          >
+            update
+          </button>
+        </div>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
+        {isModalOpen && (
+        <IdVerificationModel
+          isOpen={isModalOpen}
+          selectedData={selectedData}
+          onClose={handleCloseModal}
+                   />
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           id Verification Details

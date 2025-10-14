@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Globe, DollarSign, CreditCard, Usb } from "lucide-react";
+import { Globe, DollarSign, CreditCard, Usb, ArrowLeft } from "lucide-react";
 
 const countries = ["USA", "UK", "India", "Canada", "Europe"];
 
@@ -69,10 +69,27 @@ const WalletPaymentCards = () => {
 
   return (
     <div className="max-w-xxl mx-auto  space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-5">
-        Wallet Payment
-      </h1>
+       <div className="flex flex-row items-center justify-between flex-wrap">
+        {/* Left side */}
+        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+               Wallet Payment
+        </h1>
 
+        {/* Right side */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+       text-gray-800 dark:text-gray-200 font-medium 
+       rounded-md shadow-sm border border-gray-300 dark:border-gray-600
+       hover:bg-gray-200 dark:hover:bg-gray-600 
+       transition-colors duration-200 focus:outline-none focus:ring-2 
+       focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
+        >
+          <ArrowLeft className="mr-2 w-4 h-4" />
+          Back
+        </button>
+      </div>
+    
       {/* Country Dropdown */}
       <div className="mb-5 w-full">
         <label

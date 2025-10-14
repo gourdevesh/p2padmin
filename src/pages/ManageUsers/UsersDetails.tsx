@@ -10,6 +10,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import * as Yup from "yup";
+import { getUserDetails, getUserDetailsbyId, updateUserNotification } from "../../services/userService";
+import { showToast } from "../../utils/toast";
+import UpdateUserStatusModel from "../../Models/UpdateUserStatusModel";
+import NotificationModal from "../../Models/NotificationModal";
 
 
 type UserDetailParams = {
@@ -166,18 +170,46 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const { user_id } = useParams<UserDetailParams>();
   const location = useLocation();
   const state = location.state as { data: RowType };
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
-  const userDetail = state?.data;
+
+  const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No auth token found");
+        if (!user_id) throw new Error("No user_id in params");
+
+        const data = await getUserDetailsbyId(token, Number(user_id));
+        setUser(data); // full response {status, message, data, analytics}
+      } catch (err: any) {
+        showToast("error", err.message || "Failed to load user details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+  useEffect(() => {
+  
+  fetchUser();
+  }, [user_id]);
+
+  const userDetail = user?.data;
+  const analytics = user?.analytics;
+
+
   const initialValues = {
-    firstName: userDetail?.username ?? "",
-    lastName: "kumar", // Assuming you have last name separately
-    email: userDetail?.email ?? "",
-    phone_number: userDetail?.phone_number ?? "9999999999",
-    address: "No9 bus stop nekede old road",
-    city: userDetail?.city ?? "",
-    state: "Imo",
-    zip: "46001",
-    country: userDetail?.country ?? "country",
+    firstName: userDetail?.user?.username ?? "",
+    lastName: "kumar",
+    email: userDetail?.user?.email ?? "",
+    phone_number: userDetail?.user?.phone_number ?? "9999999999",
+    address: userDetail?.address ?? "TaraMandal",
+    city: userDetail?.user?.countryData?.city ?? "",
+    state: "Imo", zip: "46001",
+    country: userDetail?.user?.countryData?.country ?? "country",
   };
 
   const validationSchema = Yup.object({
@@ -192,9 +224,63 @@ const UserDetail: React.FC<UserDetailProps> = ({
     console.log("Form data", values);
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState<any[]>([]);
+
+
+  const handleUpdateClick = () => {
+    setIsModalOpen(true);
+    setSelectedData(userDetail?.user)
+  };
+
+  const handleNotification = () => {
+    setIsOpen(true);
+    setSelectedData(userDetail?.user)
+  };
+
+ const token = localStorage.getItem("authToken");
+
+  const handleSend = async (formData: {
+    title: string;
+    message: string;
+    type: string;
+    user_id: string;
+  }) => {
+    try {
+      console.log("Sending Notification:", formData);
+
+      if (!token) {
+        showToast("error", "Token not found. Please login again.");
+        return;
+      }
+
+      await updateUserNotification(token, formData);
+      showToast("success", "Notification sent successfully!");
+      setIsOpen(false);
+    } catch (error: any) {
+      showToast("error", error.message || "Failed to send notification");
+      console.error("Error sending notification:", error);
+    }
+  };
+
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
+      <UpdateUserStatusModel
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => console.log("Trade completed!")}
+        selectedData={selectedData}
+        fetchUser ={fetchUser}
+      />
+      {isOpen && (
+        <NotificationModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onSubmit={handleSend}
+          selectedData = {selectedData}
+        />
+      )}
       {/* Header */}
       <header className="flex flex-wrap items-center justify-between mb-6 gap-3">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -252,6 +338,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
 
 
       {/* Crypto Cards Grid */}
+
       <div
         style={{
           display: "grid",
@@ -282,14 +369,95 @@ const UserDetail: React.FC<UserDetailProps> = ({
           <span className="text-lg font-bold">≞</span>
           <span>Logins</span>
         </button>
-        <button className="flex-1 flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-md shadow">
+        <button     
+            onClick={handleNotification}
+ className="flex-1 flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-md shadow">
           <span className="text-lg font-bold">🔔</span>
           <span>Notifications</span>
         </button>
-        <button className="flex-1 flex items-center justify-center space-x-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-3 rounded-md shadow">
-          <span className="text-lg font-bold">🚫</span>
-          <span>Ban User</span>
-        </button>
+     <button
+  onClick={handleUpdateClick}
+  className={`flex-1 flex items-center justify-center space-x-2 px-5 py-3 rounded-md shadow text-white transition-all duration-200 
+    ${
+      userDetail?.user?.user_status === "active"
+        ? "bg-green-500 hover:bg-green-600"
+        : userDetail?.user?.user_status === "block"
+        ? "bg-red-500 hover:bg-red-600"
+        : userDetail?.user?.user_status === "terminate"
+        ? "bg-gray-500 hover:bg-gray-600"
+        : "bg-orange-400 hover:bg-orange-500"
+    }`}
+>
+  <span className="text-lg font-bold">
+    {userDetail?.user?.user_status === "active"
+      ? "✅"
+      : userDetail?.user?.user_status === "block"
+      ? "🚫"
+      : userDetail?.user?.user_status === "terminate"
+      ? "⚫"
+      : "⚙️"}
+  </span>
+  <span className="capitalize font-semibold">
+    {userDetail?.user?.user_status || "Unknown"}
+  </span>
+</button>
+
+      </div>
+      <div className="overflow-x-auto bg-white dark:bg-gray-900 p-4 rounded-lg shadow mt-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 text-sm md:text-base">
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Email</span>
+            <span className="text-gray-800 dark:text-gray-100">{user?.data?.user?.email || "—"}</span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Joined</span>
+            <span className="text-gray-800 dark:text-gray-100">{user?.data?.user?.joined_at || "—"}</span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Country</span>
+            <span className="text-gray-800 dark:text-gray-100">{user?.data?.user?.countryData?.country || "—"}</span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Login Status</span>
+            <span
+              className={`px-2 py-0.5 rounded-md text-white text-center ${user?.data?.user?.login_status === "Active"
+                ? "bg-green-500"
+                : "bg-red-500"
+                }`}
+            >
+              {user?.data?.user?.login_status || "—"}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">User Status</span>
+            <span
+              className={`px-2 py-0.5 rounded-md text-white text-center ${user?.data?.user?.user_status === "Verified"
+                ? "bg-green-600"
+                : "bg-yellow-500"
+                }`}
+            >
+              {user?.data?.user?.user_status || "—"}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Deposits</span>
+            <span className="text-green-600 dark:text-green-400 font-medium">
+              {user?.analytics?.deposits ?? 0}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-600 dark:text-gray-300">Withdrawals</span>
+            <span className="text-red-500 dark:text-red-400 font-medium">
+              {user?.analytics?.withdrawals ?? 0}
+            </span>
+          </div>
+        </div>
       </div>
 
 
@@ -298,10 +466,13 @@ const UserDetail: React.FC<UserDetailProps> = ({
           Information of {userDetail?.username ?? ""}
         </h2>
 
+
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
+          enableReinitialize
+
         >
           {({ values, handleChange, }) => (
             <Form>
