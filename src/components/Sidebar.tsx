@@ -221,9 +221,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
             return (
               <li key={item.id}>
-                <button
+                <button  
                   onClick={() => item.children ? toggleExpand(item.id) : handleNavigation(item.path!)}
-                  className={`w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-colors ${isActive
+                  className={`w-full flex items-center  ${isCollapsed ? 'justify-center px-' : 'justify-start px-3'}  py-2.5 rounded-lg text-left transition-colors ${isActive
                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border-r-2 border-primary-500'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 '
                     }`}
@@ -275,7 +275,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       </nav>
 
       {/* Theme Toggle */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800   ">
+<div
+  className={`${ 
+    isCollapsed ? 'p-2' : 'p-4 '
+  } border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800`}
+>
         <button
           onClick={toggleTheme}
           className="w-full flex items-center px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

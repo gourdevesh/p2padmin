@@ -75,14 +75,14 @@ const PaymentDetails: React.FC = () => {
         fetchData(queryParams.toString(), 1);
     };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedData, setSelectedData] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedData, setSelectedData] = useState<number | null>(null);
 
-  // 🔹 Click handler to open modal with ID
-  const handleUpdateClick = (row: any) => {
-    setSelectedData(row);
-    setIsModalOpen(true);
-  };
+    // 🔹 Click handler to open modal with ID
+    const handleUpdateClick = (row: any) => {
+        setSelectedData(row);
+        setIsModalOpen(true);
+    };
 
 
     const columns = [
@@ -136,7 +136,7 @@ const PaymentDetails: React.FC = () => {
                 <button
                     type="button"
                     className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-                   onClick={() => handleUpdateClick(row)}
+                    onClick={() => handleUpdateClick(row)}
                 >
                     Update
                 </button>
@@ -147,27 +147,27 @@ const PaymentDetails: React.FC = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-               <div className="flex flex-row items-center justify-between flex-wrap">
-        {/* Left side */}
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Payment Details
-        </h1>
+            <div className="flex flex-row items-center justify-between flex-wrap">
+                {/* Left side */}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Payment Details
+                </h1>
 
-        {/* Right side */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+                {/* Right side */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
        text-gray-800 dark:text-gray-200 font-medium 
        rounded-md shadow-sm border border-gray-300 dark:border-gray-600
        hover:bg-gray-200 dark:hover:bg-gray-600 
        transition-colors duration-200 focus:outline-none focus:ring-2 
        focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
-        >
-          <ArrowLeft className="mr-2 w-4 h-4" />
-          Back
-        </button>
-      </div>
-    
+                >
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    Back
+                </button>
+            </div>
+
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                     Filter Payment Details
@@ -209,17 +209,17 @@ const PaymentDetails: React.FC = () => {
                     </select>
 
                     {/* Status */}
-                 <select
-  value={filters.status}
-  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-  className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
+                    <select
+                        value={filters.status}
+                        onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                        className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
              bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
->
-  <option value="">Status</option>
-  <option value="pending"> Pending</option>
-  <option value="verified"> Verified</option>
-  <option value="reject">Rejected</option>
-</select>
+                    >
+                        <option value="">Status</option>
+                        <option value="pending"> Pending</option>
+                        <option value="verified"> Verified</option>
+                        <option value="reject">Rejected</option>
+                    </select>
 
 
                     {/* Apply Button */}
@@ -257,12 +257,12 @@ const PaymentDetails: React.FC = () => {
                 loading={loading}
                 totalItems={PaymentDetails.length}
             />
-             <PaymentUpdateStatusModel
-        isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)} 
-  selectedData ={selectedData}
-  onSuccess ={fetchData}
-      />
+            <PaymentUpdateStatusModel
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                selectedData={selectedData}
+                onSuccess={fetchData}
+            />
         </div>
     );
 };

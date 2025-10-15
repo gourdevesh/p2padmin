@@ -1,5 +1,5 @@
 // UpdateWebsiteForm.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { showToast } from "../../utils/toast";
 
 const WebsideUpdateDetails: React.FC = () => {
   const navigate = useNavigate()
+  const [loading ,setLoading] = useState(false)
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -18,14 +19,15 @@ const WebsideUpdateDetails: React.FC = () => {
     },
  onSubmit: async (values) => {
   try {
+    setLoading(true)
     const token = localStorage.getItem("authToken") || "";
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("url", values.url);
     formData.append("title", values.title);
-
     const res = await updateNameTitle(token, formData);
     showToast("success", "Website info updated successfully!");
+    navigate("/system-setting")
   } catch (error: any) {
     const apiError = error.response?.data;
 
@@ -38,6 +40,9 @@ const WebsideUpdateDetails: React.FC = () => {
     } else {
       showToast("error", apiError?.message || error.message || "Something went wrong");
     }
+  }
+  finally{
+    setLoading(false)
   }
  }
 
@@ -66,7 +71,7 @@ const WebsideUpdateDetails: React.FC = () => {
         </button>
       </div>
 
-      <div className=" flex items-center justify-center ">
+      <div className=" flex items-center justify-center mt-4 ">
         <div className="bg-white shadow-lg rounded-lg w-full p-6 max-w-xxl">
 
           <form onSubmit={formik.handleSubmit} className="space-y-5">
@@ -116,10 +121,14 @@ const WebsideUpdateDetails: React.FC = () => {
             </div>
 
             <button
+            disabled = {loading}
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition-colors"
+          
+              className={`w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition-colors ${
+                loading ? "cursor-not-allowed opacity-70" :"hover:bg-blue-700"
+              }`}
             >
-              Update
+         {loading ? "Updating..." : "Update"}
             </button>
           </form>
         </div>

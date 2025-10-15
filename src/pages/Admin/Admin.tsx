@@ -67,23 +67,6 @@ export const Admin: React.FC = () => {
     { key: "role", label: "role", sortable: true },
     { key: "email", label: "email", sortable: true },
     { key: "admin_status", label: "admin_status", sortable: true },
-    {
-      key: "actions",
-      label: "Actions",
-      render: (value: any, row: any) => (
-        <button
-          type="button"
-          className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-          onClick={() =>
-            navigate(`/user-detail/${row.user_id}`, {
-              state: { data: row },
-            })
-          }
-        >
-          Update
-        </button>
-      ),
-    },
   ];
 
   return (
