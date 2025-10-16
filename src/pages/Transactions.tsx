@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Download, RefreshCw, ArrowUpRight, ArrowDownLeft, Eye, MoreHorizontal } from 'lucide-react';
 import { Table } from '../components/Table';
 import { Transaction } from '../types';
+import { text } from 'stream/consumers';
 
 const mockTransactions: Transaction[] = [
   {
@@ -77,13 +78,20 @@ export const Transactions: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [copied, setCopied] = useState(false);
+  
+ const handleCopy = (textToCopy:string) => {
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500); // reset after 1.5s
+  };
 
   const filteredTransactions = mockTransactions.filter(transaction => {
     const matchesSearch = transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.userName.toLowerCase().includes(searchTerm.toLowerCase());
+      transaction.userName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
     const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
-    
+
     return matchesSearch && matchesStatus && matchesType;
   });
 
@@ -94,7 +102,7 @@ export const Transactions: React.FC = () => {
       failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
       cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
     };
-    
+
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${badgeClasses[status as keyof typeof badgeClasses]}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -122,7 +130,7 @@ export const Transactions: React.FC = () => {
       deposit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
       withdrawal: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
     };
-    
+
     return (
       <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${badgeClasses[type as keyof typeof badgeClasses]}`}>
         {getTypeIcon(type)}
@@ -288,7 +296,7 @@ export const Transactions: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -302,7 +310,7 @@ export const Transactions: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -316,7 +324,7 @@ export const Transactions: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>

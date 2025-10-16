@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, Copy } from "lucide-react";
 import { getTradeHistory } from "../services/TradeHistory";
 import { decryptData } from "../services/decryptService";
 import { Table } from '../components/Table';
@@ -34,6 +34,8 @@ const WalletDetails: React.FC = () => {
     const [tradeData, setTradeData] = useState<TradeType[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
+    const [copiedRow, setCopiedRow] = useState<number | null>(null);
+
     const [queryString, setQueryString] = useState("");
     const [filters, setFilters] = useState({
         user_id: "",
@@ -81,18 +83,18 @@ const WalletDetails: React.FC = () => {
         if (filters.status) queryParams.append("status", filters.status);
         if (filters.wallet_address) queryParams.append("wallet_address", filters.wallet_address);
         const query = queryParams.toString();
-        setQueryString(query);   // store query in state
-        setCurrentPage(1);       // reset to page 1
+        setQueryString(query);
+        setCurrentPage(1);
     };
 
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedData, setSelectedData] = useState<TradeType | null>(null);
-
-
-    const handleUpdateClick = (row: TradeType) => {
-        setSelectedData(row);
-        setIsModalOpen(true);
+    const handleCopy = (textToCopy: string, rowIndex: number) => {
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                setCopiedRow(rowIndex);
+                setTimeout(() => setCopiedRow(null), 1500);
+            })
+            .catch(err => console.error("Failed to copy: ", err));
     };
 
     const columns = [
@@ -105,7 +107,35 @@ const WalletDetails: React.FC = () => {
         { key: "blockchain", label: "blockchain", sortable: true, render: (value: string | null) => value || "-" },
         { key: "asset", label: "assets", sortable: true },
         { key: "network", label: "network", sortable: true },
-        { key: "wallet_address", label: "wallet_address", sortable: true },
+        {
+            key: "wallet_address",
+            label: "Wallet Address",
+            sortable: true,
+            render: (value: string, row: any) => {
+                if (!value) return "-";
+
+                const rowIndex = row.index;
+                const isCopied = copiedRow === rowIndex;
+
+                return (
+                    <span className="flex items-center">
+                        {`${value.slice(0, 6)}...${value.slice(-5)}`}
+                        <span
+                            className="ml-2 cursor-pointer hover:text-blue-800"
+                            onClick={() => handleCopy(value, rowIndex)}
+                        >
+                            {isCopied ? (
+                                <Check className="text-green-500" size={18} />
+                            ) : (
+                                <Copy size={18} />
+                            )}
+                        </span>
+                    </span>
+                );
+            },
+        },
+
+
         { key: "remaining_amount", label: "Remaining Amount", sortable: true },
 
         {
@@ -259,7 +289,7 @@ const WalletDetails: React.FC = () => {
             {/* Trade Table */}
             <Table
                 columns={columns}
-                data={tradeData}
+                data={tradeData.map((item, index) => ({ ...item, index }))}
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}

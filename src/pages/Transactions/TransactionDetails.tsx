@@ -8,6 +8,8 @@ import PaymentUpdateStatusModel from "../../Models/PayemtUpdateStatusModel"; // 
 import UpdateUPIStatusModel from "../../Models/UpdateUPIStatusModel"; // Optional
 import { getTransactionDetails } from "../../services/TransactionService";
 import { ArrowLeft } from "lucide-react";
+import { Copy, Check } from "lucide-react";
+
 
 interface TradeType {
     trade_id: number;
@@ -36,6 +38,9 @@ const TransactionsDetails: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
     const [queryString, setQueryString] = useState("");
+    const [copiedRows, setCopiedRows] = useState<{ [key: string]: boolean }>({});
+
+
     const [filters, setFilters] = useState({
         user_id: "",
         txn_hash: "",
@@ -108,41 +113,122 @@ const TransactionsDetails: React.FC = () => {
         setSelectedData(row);
         setIsModalOpen(true);
     };
-
+    const handleCopy = (textToCopy: string, rowKey: string) => {
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                setCopiedRows(prev => ({ ...prev, [rowKey]: true }));
+                setTimeout(() => {
+                    setCopiedRows(prev => ({ ...prev, [rowKey]: false }));
+                }, 1500);
+            })
+            .catch(err => console.error("Failed to copy: ", err));
+    };
     const columns = [
         { key: "txn_id", label: "Txn ID", sortable: true },
         { key: "user_id", label: "User ID", sortable: true },
         { key: "txn_type", label: "Txn Type", sortable: true },
-     {
-    key: "from_address",
-    label: "From Address",
-    sortable: true,
-    render: (value: string) =>
-      value ? `${value.slice(0, 6)}...${value.slice(-5)}` : "-"
-  },
-  {
-    key: "to_address",
-    label: "To Address",
-    sortable: true,
-    render: (value: string) =>
-      value ? `${value.slice(0, 6)}...${value.slice(-5)}` : "-"
-  },
-  {
-    key: "txn_hash_id",
-    label: "Txn Hash",
-    sortable: true,
-    render: (value: string) =>
-      value ? `${value.slice(0, 6)}...${value.slice(-5)}` : "-"
-  },
+        {
+            key: "from_address",
+            label: "From Address",
+            sortable: true,
+            render: (value: string) =>
+                value ? `${value.slice(0, 6)}...${value.slice(-5)}` : "-"
+        },
+        {
+            key: "to_address",
+            label: "To Address",
+            sortable: true,
+            render: (value: string) =>
+                value ? `${value.slice(0, 6)}...${value.slice(-5)}` : "-"
+        },
+        {
+            key: "txn_hash_id",
+            label: "Txn Hash",
+            sortable: true,
+            render: (value: string, row: any) => {
+                if (!value) return "-";
+
+                const isCopied = copiedRows[value]; // use txn_hash_id as unique key
+
+                return (
+                    <span className="flex items-center ">
+                        {`${value.slice(0, 6)}...${value.slice(-5)}`}
+                        <span
+                            className="ml-2 cursor-pointer"
+                            onClick={() => handleCopy(value, value)} 
+                        >
+                            {isCopied ? (
+                                <Check className="text-green-500" size={18} />
+                            ) : (
+                                <Copy size={18} />
+                            )}
+                        </span>
+                    </span>
+                );
+            },
+        },
+
         { key: "asset", label: "Asset", sortable: true },
         { key: "network", label: "Network", sortable: true },
-        { key: "available_amount", label: "Available Amount", sortable: true },
-        { key: "credit_amount", label: "Credit Amount", sortable: true },
-        { key: "debit_amount", label: "Debit Amount", sortable: true },
-        { key: "transfer_percentage", label: "Transfer %", sortable: true },
-        { key: "transfer_fee", label: "Transfer Fee", sortable: true },
-        { key: "paid_amount", label: "Paid Amount", sortable: true },
-        { key: "remaining_amount", label: "Remaining Amount", sortable: true },
+        {
+            key: "available_amount",
+            label: "Available Amount",
+            sortable: true,
+            render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "credit_amount", label: "Credit Amount", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "debit_amount", label: "Debit Amount", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "transfer_percentage", label: "Transfer %", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "transfer_fee", label: "Transfer Fee", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "paid_amount", label: "Paid Amount", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
+        {
+            key: "remaining_amount", label: "Remaining Amount", sortable: true, render: (value: number | string) => {
+                if (value === null || value === undefined) return "-";
+                const num = Number(value);
+                if (isNaN(num)) return value;
+                return num.toFixed(12).replace(/(\.\d*?[1-9])0+$/, "$1");
+            },
+        },
         { key: "method", label: "Method", sortable: true },
         {
             key: "status",
@@ -151,10 +237,10 @@ const TransactionsDetails: React.FC = () => {
             render: (value: string) => (
                 <span
                     className={`px-2 py-1 rounded-full text-white ${value === "success"
-                            ? "bg-green-500"
-                            : value === "pending"
-                                ? "bg-yellow-500"
-                                : "bg-gray-500"
+                        ? "bg-green-500"
+                        : value === "pending"
+                            ? "bg-yellow-500"
+                            : "bg-gray-500"
                         }`}
                 >
                     {value}
@@ -173,27 +259,27 @@ const TransactionsDetails: React.FC = () => {
 
     return (
         <div className="space-y-6">
-                <div className="flex flex-row items-center justify-between  flex-wrap">
-                                {/* Left side */}
-                                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Trade Transactions
-                                </h1>
-                        
-                                {/* Right side */}
-                                <button
-                                  onClick={() => navigate(-1)}
-                                  className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+            <div className="flex flex-row items-center justify-between  flex-wrap">
+                {/* Left side */}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Trade Transactions
+                </h1>
+
+                {/* Right side */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
                                text-gray-800 dark:text-gray-200 font-medium 
                                rounded-md shadow-sm border border-gray-300 dark:border-gray-600
                                hover:bg-gray-200 dark:hover:bg-gray-600 
                                transition-colors duration-200 focus:outline-none focus:ring-2 
                                focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
-                                >
-                                  <ArrowLeft className="mr-2 w-4 h-4" />
-                                  Back
-                                </button>
-                              </div>
-            
+                >
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    Back
+                </button>
+            </div>
+
 
             {/* Filters */}
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
@@ -287,29 +373,29 @@ const TransactionsDetails: React.FC = () => {
                     >
                         Apply
                     </button>
-                              <button
-  onClick={() => {
-    // Reset filters
-    setFilters({
-      user_id: "",
-      txn_hash: "",
-      txn_type: "",
-      asset: "",
-      network: "",
-      method: "",
-      status: "",
-      start_date: "",
-      end_date: "",
-    });
+                    <button
+                        onClick={() => {
+                            // Reset filters
+                            setFilters({
+                                user_id: "",
+                                txn_hash: "",
+                                txn_type: "",
+                                asset: "",
+                                network: "",
+                                method: "",
+                                status: "",
+                                start_date: "",
+                                end_date: "",
+                            });
 
-    setQueryString("");
-    setCurrentPage(1);
-    fetchData("", 1);
-  }}
-  className="px-4 py-2 w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
->
-  Reset
-</button>
+                            setQueryString("");
+                            setCurrentPage(1);
+                            fetchData("", 1);
+                        }}
+                        className="px-4 py-2 w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                    >
+                        Reset
+                    </button>
                 </div>
             </div>
 

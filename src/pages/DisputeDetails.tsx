@@ -290,60 +290,7 @@ export const DisputeDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Action Buttons */}
-
-
-      {/* =================== Modals =================== */}
-
-      {/* Predefined Message Modal */}
-      {/* <Dialog
-        open={openPredefinedModal}
-        onClose={() => setOpenPredefinedModal(false)}
-        className="relative z-50"
-      >
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-            <Dialog.Title className="text-lg font-semibold text-gray-800 dark:text-white">
-              Send Predefined Message
-            </Dialog.Title>
-
-            <div className="space-y-3 mt-4">
-              {predefinedMessages.map((msg, idx) => (
-                <label key={idx} className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="predefined"
-                    value={msg}
-                    onChange={(e) => setSelectedMessage(e.target.value)}
-                  />
-                  <span>{msg}</span>
-                </label>
-              ))}
-            </div>
-
-            <div className="flex justify-end mt-6 space-x-2">
-              <button
-                className="px-4 py-2 bg-gray-300 rounded-lg"
-                onClick={() => setOpenPredefinedModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                onClick={handleSendPredefinedMessage}
-              >
-                Send
-              </button>
-            </div>
-          </Dialog.Panel>
-        </div>
-      </Dialog> */}
-
-      {/* Release Crypto Modal */}
-   
-
-      {/* Mark Result Modal */}
+  
       <Dialog
         open={openResultModal}
         onClose={() => setOpenResultModal(false)}

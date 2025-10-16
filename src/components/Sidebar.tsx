@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
     },
     { id: 'assetsDetail', label: 'assetDetail', icon: 'Wallet', path: '/assets-details' },
     { id: 'admin', label: 'admin', icon: 'User', path: '/admin' },
-    { id: 'Advertisements', label: 'Advertisements', icon: 'LayoutDashboard', path: '/advertisements' },
+    { id: 'Advertisements', label: 'offer', icon: 'LayoutDashboard', path: '/advertisements' },
     {
       id: 'admin Verification',
       label: 'Admin Verification',
