@@ -44,7 +44,7 @@ const InternationalPaymentForm: React.FC = () => {
        <>
       <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-gray-900 dark:text-white ">
-International Payment
+ Payment
         </h1>
         <button
           onClick={() => navigate(-1)}
@@ -63,7 +63,7 @@ International Payment
     <div className="max-w-xxl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mt-7">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Country */}
-        <div>
+        {/* <div>
           <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">Bank Account Country*</label>
           <select
             name="country"
@@ -76,9 +76,9 @@ International Payment
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-        </div>
+        </div> */}
 
-        {/* Currency */}
+        
         <div>
           <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">Currency*</label>
           <select

@@ -50,7 +50,7 @@ export const DisputeDetail: React.FC = () => {
     tradeId: "445",
     crypto: "BTC",
     amount: 0.25,
-    price: 35000,
+    price: 25000,
     status: "pending",
     result: "reporter" // or "reported"
 
@@ -106,101 +106,114 @@ export const DisputeDetail: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
       {/* Users */}
-     <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md">
-  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
 
-    {/* Reporter & Reported */}
-    <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full md:w-auto">
+          {/* Reporter & Reported */}
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full md:w-auto">
 
-      {/* Reporter */}
-      <div className="flex items-center gap-2 min-w-0">
-        <User size={24} className="text-white" />
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center">
-            <p className="text-sm text-white/70">Reporter</p>
-               <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-              {dispute.status === "pending" ? "Buyer" : ""}
-            </span>
+            {/* Reporter */}
+            <div className="flex items-center gap-2 min-w-0">
+              <User size={24} className="text-white" />
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center">
+                  <p className="text-sm text-white/70">Reporter</p>
+
+                  <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                    {dispute.status === "pending" ? "Buyer" : ""}
+                  </span>
+                  <button
+                    className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-lg"
+                    onClick={() => setOpenPredefinedModal(true)}
+                  >
+                    Message
+                  </button>
+                </div>
+                <div className="flex items-center mt-1">
+                  <p className="text-lg font-semibold text-white truncate">{dispute.reporter}</p>
+                  <p className="ml-3 text-xs text-white">
+                    Total: ₹{dispute.price}
+                  </p>
+
+                  {dispute.result === "reporter" && (
+                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                  )}
+                  {dispute.result === "reported" && (
+                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                  )}
+
+
+                </div>
+              </div>
+            </div>
+
+            {/* Reported */}
+            <div className="flex items-center gap-3 min-w-0">
+              <User size={24} className="text-white" />
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center ">
+                  <p className="text-sm text-white/70">Reported</p>
+
+
+                  <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                    {dispute.status === "pending" ? "Seller" : ""}
+                  </span>
+                  <button
+                    className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
+                    onClick={() => setOpenPredefinedModal(true)}
+                  >
+                    Message
+                  </button>
+                </div>
+                <div className="flex items-center mt-1">
+                  <p className="text-lg font-semibold text-white truncate">{dispute.reported}</p>
+               <p className="ml-3 text-xs text-white font-medium">
+  Total: ₹{dispute.price}
+</p>
+
+                  {dispute.result === "reported" && (
+                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                  )}
+                  {dispute.result === "reporter" && (
+                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <ReleaseCryptoModal
+            isOpen={openReleaseModal}
+            onClose={() => setOpenReleaseModal(false)}
+            onConfirm={handleReleaseCrypto}
+            buyerName={dispute.reporter} // dynamically show buyer
+          />
+          <PredefinedMessageModal
+            isOpen={openPredefinedModal}
+            onClose={() => setOpenPredefinedModal(false)}
+            onSend={handleSendPredefinedMessage}
+          />
+
+          {/* Trade ID & Release Button */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
+            <div className="flex items-center gap-2">
+              <CreditCard size={24} className="text-white/80" />
+              <div>
+                <p className="text-sm text-white/70">Trade ID</p>
+                <p className="text-lg font-semibold text-white truncate">{dispute.tradeId}</p>
+              </div>
+            </div>
             <button
-              className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-lg"
-              onClick={() => setOpenPredefinedModal(true)}
+              className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+              onClick={() => setOpenReleaseModal(true)}
             >
-              Message
+              Release Crypto
             </button>
           </div>
-          <div className="flex items-center mt-1">
-            <p className="text-lg font-semibold text-white truncate">{dispute.reporter}</p>
-            {dispute.result === "reporter" && (
-              <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-            )}
-            {dispute.result === "reported" && (
-              <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-            )}
-          </div>
+
         </div>
       </div>
-
-      {/* Reported */}
-      <div className="flex items-center gap-3 min-w-0">
-        <User size={24} className="text-white" />
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center ">
-            <p className="text-sm text-white/70">Reported</p>
-            <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-              {dispute.status === "pending" ? "Seller" : ""}
-            </span>
-            <button
-              className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
-              onClick={() => setOpenPredefinedModal(true)}
-            >
-              Message
-            </button>
-          </div>
-          <div className="flex items-center mt-1">
-            <p className="text-lg font-semibold text-white truncate">{dispute.reported}</p>
-            {dispute.result === "reported" && (
-              <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-            )}
-            {dispute.result === "reporter" && (
-              <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-       <ReleaseCryptoModal  
-        isOpen={openReleaseModal}
-        onClose={() => setOpenReleaseModal(false)}
-        onConfirm={handleReleaseCrypto}
-        buyerName={dispute.reporter} // dynamically show buyer
-      />
-        <PredefinedMessageModal
-        isOpen={openPredefinedModal}
-        onClose={() => setOpenPredefinedModal(false)}
-        onSend={handleSendPredefinedMessage}
-      />
-
-    {/* Trade ID & Release Button */}
-    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
-      <div className="flex items-center gap-2">
-        <CreditCard size={24} className="text-white/80" />
-        <div>
-          <p className="text-sm text-white/70">Trade ID</p>
-          <p className="text-lg font-semibold text-white truncate">{dispute.tradeId}</p>
-        </div>
-      </div>
-      <button
-  className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-        onClick={() => setOpenReleaseModal(true)}
-      >
-        Release Crypto
-      </button>
-    </div>
-
-  </div>
-</div>
 
 
 
@@ -290,7 +303,7 @@ export const DisputeDetail: React.FC = () => {
         </div>
       </div>
 
-  
+
       <Dialog
         open={openResultModal}
         onClose={() => setOpenResultModal(false)}

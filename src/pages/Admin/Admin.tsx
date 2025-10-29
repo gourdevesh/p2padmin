@@ -90,7 +90,7 @@ export const Admin: React.FC = () => {
               className="p-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={role}
               onChange={(e) => {
-                setCurrentPage(1); // ✅ reset page when role changes
+                setCurrentPage(1); 
                 setRole(e.target.value);
               }}
             >

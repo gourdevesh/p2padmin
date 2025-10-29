@@ -72,43 +72,43 @@ export const Disputes: React.FC = () => {
 
   const filteredDisputes = mockDisputes.filter(dispute => {
     const matchesSearch = dispute.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dispute.reporter.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dispute.reported.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dispute.tradeId.toLowerCase().includes(searchTerm.toLowerCase());
+      dispute.reporter.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dispute.reported.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dispute.tradeId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || dispute.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || dispute.priority === priorityFilter;
     const matchesCategory = categoryFilter === 'all' || dispute.category === categoryFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
   });
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { 
+      pending: {
         color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
         icon: Clock,
         label: 'Pending'
       },
-      investigating: { 
+      investigating: {
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
         icon: Eye,
         label: 'Investigating'
       },
-      resolved: { 
+      resolved: {
         color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
         icon: CheckCircle,
         label: 'Resolved'
       },
-      escalated: { 
+      escalated: {
         color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
         icon: AlertTriangle,
         label: 'Escalated'
       },
     };
-    
+
     const config = statusConfig[status as keyof typeof statusConfig];
     const StatusIcon = config.icon;
-    
+
     return (
       <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
         <StatusIcon size={12} className="mr-1" />
@@ -123,7 +123,7 @@ export const Disputes: React.FC = () => {
       medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
       low: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 border-green-200 dark:border-green-800',
     };
-    
+
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md border ${priorityClasses[priority as keyof typeof priorityClasses]}`}>
         {priority.charAt(0).toUpperCase() + priority.slice(1)}
@@ -133,7 +133,7 @@ export const Disputes: React.FC = () => {
 
   const handleDisputeAction = (disputeId: string, action: string) => {
     console.log(`Action: ${action} for dispute: ${disputeId}`);
-navigate('/dispute-details');
+    navigate('/dispute-details');
     // Implement action handling logic here (e.g., navigate to detail page, open modal, etc.)
   };
 
@@ -165,11 +165,11 @@ navigate('/dispute-details');
         <div className="space-y-1">
           <div className="flex items-center text-sm">
             <User size={12} className="text-gray-400 mr-1" />
-            <span className="font-medium text-gray-900 dark:text-white">Reporter: {value}</span>
+            <span onClick={() => navigate("/All-detail-user")} className="cursor-pointer font-medium text-gray-900 dark:text-white">Reporter: {value}</span>
           </div>
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <User size={12} className="text-gray-400 mr-1" />
-            <span>Reported: {row.reported}</span>
+            <span className='cursor-pointer' onClick={() => navigate("/All-detail-user") } >Reported: {row.reported}</span>
           </div>
         </div>
       ),
@@ -289,7 +289,7 @@ navigate('/dispute-details');
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -303,7 +303,7 @@ navigate('/dispute-details');
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -317,7 +317,7 @@ navigate('/dispute-details');
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>

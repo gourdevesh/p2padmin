@@ -56,6 +56,8 @@ import WalletDetails from './pages/WalletDetails';
 import UpdateSetting from './pages/Setting/UpdateSetting';
 import { FeedBack } from './pages/FeedBack/FeedBack';
 import CreateFeedBack from './pages/FeedBack/CreateFeedBack';
+import AllDetailUser from './pages/ManageUsers/AllDetailUser';
+import VisaPaymentForm from './pages/VisaPaymentForm';
 
 function AppRoutes() {
   const location = useLocation();
@@ -95,7 +97,7 @@ function AppRoutes() {
           <Route path="/wallet-details" element={<WalletDetails />} />
           <Route path="/update-setting" element={<UpdateSetting />} />
           <Route path="/feedBack" element={<FeedBack />} />
-                    <Route path="/create-feedback" element={<CreateFeedBack />} />
+          <Route path="/create-feedback" element={<CreateFeedBack />} />
 
 
 
@@ -130,6 +132,10 @@ function AppRoutes() {
           <Route path="/id-verification-details" element={<VerificationDetails />} />
           <Route path="/WebsideUpdateDetails" element={<WebsideUpdateDetails />} />
           <Route path="/UpdateWebsiteLogoFavicon" element={<UpdateWebsiteLogoFavicon />} />
+          <Route path="/All-detail-user" element={<AllDetailUser />} />
+          <Route path="/visa" element={<VisaPaymentForm />} />
+
+
         </Route>
       </Route>
 

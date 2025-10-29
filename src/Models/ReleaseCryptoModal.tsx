@@ -17,14 +17,12 @@ const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 flex items-start justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300 ${
-        isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-      }`}
+      className={`fixed inset-0 flex items-start justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
     >
       <div
-        className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] mt-10 p-4 sm:p-6 transform transition-all duration-500 ease-out ${
-          isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 "
-        }`}
+        className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] mt-10 p-4 sm:p-6 transform transition-all duration-500 ease-out ${isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 "
+          }`}
       >
         <div className="flex justify-between items-center mb-4 border-b -mx-4 sm:-mx-6 pb-3">
           <h2 className="text-[18px] sm:text-[20px] font-semibold mx-4 sm:mx-6">
@@ -40,9 +38,7 @@ const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
 
         <div className="mb-4 border-b pb-4 -mx-4 sm:-mx-6 dark:text-white">
           <p className="text-gray-600 mx-4 sm:mx-6 text-[14px] sm:text-[15px] dark:text-white">
-            Are you sure you want to release crypto to{" "}
-            <span className="font-medium">{buyerName}</span>? This action cannot
-            be undone.
+            Are you sure you want to release crypto? This action cannot be undone.
           </p>
 
           {/* Option to select send method */}

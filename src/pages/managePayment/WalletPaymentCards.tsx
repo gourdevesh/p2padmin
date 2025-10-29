@@ -1,172 +1,169 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Globe, DollarSign, CreditCard, Usb, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Select from "react-select";
 
-const countries = ["USA", "UK", "India", "Canada", "Europe"];
+interface PaymentMethod {
+  id: number;
+  country: string;
+  countryName: string;
+  text: string;
+}
 
-const walletCards = [
-  {
-    title: "Global Payment",
-    icon: Globe,
-    gradient: "linear-gradient(135deg, #7e5bef, #4f46e5)",
-    route: "/global-payment",
-    options: ["PayPal", "Stripe", "Other"],
-  },
-  {
-    title: "Currency Wise Payment",
-    icon: DollarSign,
-    gradient: "linear-gradient(135deg, #34d399, #3b82f6)",
-    route: "/currency-payment",
-    options: ["USD", "EUR", "INR"],
-  },
-  {
-    title: "International Payment",
-    icon: CreditCard,
-    gradient: "linear-gradient(135deg, #ec4899, #ef4444)",
-    route: "/international-payment",
-    options: ["MasterCard", "Visa", "Amex"],
-  },
-  {
-    title: "UPI Payment",
-    icon: Usb,
-    gradient: "linear-gradient(135deg, #facc15, #f97316)",
-    route: "/upi-payment",
-    options: ["PhonePe", "GPay", "Paytm"],
-  },
-];
-
-const WalletPaymentCards = () => {
+const WalletPaymentCards: React.FC = () => {
   const navigate = useNavigate();
+
+  // ✅ react-select ke format me options
+  const countries = [
+    { value: "IN", label: "India" },
+    { value: "US", label: "United States" },
+    { value: "UK", label: "United Kingdom" },
+    { value: "AU", label: "Australia" },
+    { value: "CA", label: "Canada" },
+  ];
+
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const [paymentText, setPaymentText] = useState("");
+  const [methods, setMethods] = useState<PaymentMethod[]>([]);
 
-  // Track edit state for each option individually
-  const [editingOptions, setEditingOptions] = useState<{ [key: string]: { [option: string]: boolean } }>({});
-  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string[] }>({});
+  const addMethod = () => {
+    const trimmed = paymentText.trim();
+    if (!trimmed) return;
+    if (!selectedCountry) return;
 
-  const handleCheckboxChange = (cardTitle: string, option: string) => {
-    setSelectedOptions((prev) => {
-      const prevOptions = prev[cardTitle] || [];
-      if (prevOptions.includes(option)) {
-        return { ...prev, [cardTitle]: prevOptions.filter((o) => o !== option) };
-      } else {
-        return { ...prev, [cardTitle]: [...prevOptions, option] };
-      }
-    });
+    const newMethod: PaymentMethod = {
+      id: Date.now(),
+      country: selectedCountry.value,
+      countryName: selectedCountry.label,
+      text: trimmed,
+    };
+
+    setMethods((prev) => [newMethod, ...prev]);
+    setPaymentText("");
   };
 
-  const toggleEdit = (cardTitle: string, option: string) => {
-    setEditingOptions((prev) => ({
-      ...prev,
-      [cardTitle]: { ...prev[cardTitle], [option]: !prev[cardTitle]?.[option] },
-    }));
+  const removeMethod = (id: number) => {
+    setMethods((prev) => prev.filter((m) => m.id !== id));
   };
 
-  const handleSave = (cardTitle: string, option: string) => {
-    console.log(`✅ Saved ${option} for ${cardTitle}:`, selectedOptions[cardTitle]?.includes(option));
-    toggleEdit(cardTitle, option);
-    alert(`Saved ${option} for ${cardTitle}`);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addMethod();
+    }
+  };
+
+  // ✅ Payment click handler
+  const handlePaymentClick = (method: string) => {
+    if (method.toLowerCase() === "upi") {
+      navigate("/upi-payment");
+    } else if (method.toLowerCase() === "paypal") {
+      navigate("/upi-payment");
+    } else if (method.toLowerCase() === "bank") {
+      navigate("/international-payment");
+    }
+     else if (method.toLowerCase() === "visa") {
+      navigate("/visa");
+    } 
+    else {
+      alert(`No route defined for ${method}`);
+    }
   };
 
   return (
-    <div className="max-w-xxl mx-auto  space-y-6">
-       <div className="flex flex-row items-center justify-between flex-wrap">
-        {/* Left side */}
+    <div className="max-w-xxl mx-auto space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+      {/* Header */}
+      <div className="flex flex-row items-center justify-between flex-wrap">
         <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-               Wallet Payment
+          Payment Method
         </h1>
 
-        {/* Right side */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
-       text-gray-800 dark:text-gray-200 font-medium 
-       rounded-md shadow-sm border border-gray-300 dark:border-gray-600
-       hover:bg-gray-200 dark:hover:bg-gray-600 
-       transition-colors duration-200 focus:outline-none focus:ring-2 
-       focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
+            text-gray-800 dark:text-gray-200 font-medium rounded-md shadow-sm 
+            border border-gray-300 dark:border-gray-600 hover:bg-gray-200 
+            dark:hover:bg-gray-600 transition-colors duration-200 
+            focus:outline-none focus:ring-2 focus:ring-blue-500 
+            focus:ring-offset-1 justify-center text-sm"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />
           Back
         </button>
       </div>
-    
-      {/* Country Dropdown */}
-      <div className="mb-5 w-full">
-        <label
-          htmlFor="country"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200"
-        >
-          Select Country
-        </label>
-        <select
-          id="country"
+
+      {/* ✅ Dropdown + Input + Add Button */}
+      <div className="flex gap-2 items-center">
+        <Select
           value={selectedCountry}
-          onChange={(e) => setSelectedCountry(e.target.value)}
-          className="rounded-md p-2 text-black w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          onChange={(value) => setSelectedCountry(value!)}
+          options={countries}
+          placeholder="Select a country..."
+          isSearchable
+          className="flex-1 basis-0"
+          styles={{
+            control: (base) => ({
+              ...base,
+              minHeight: "42px",
+              borderColor: "#d1d5db",
+              boxShadow: "none",
+              "&:hover": { borderColor: "#9ca3af" },
+            }),
+          }}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter payment method (e.g., UPI, PayPal)"
+          value={paymentText}
+          onChange={(e) => setPaymentText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 basis-0 border rounded p-2"
+        />
+
+        <button
+          onClick={addMethod}
+          aria-label="Add payment method"
+          className="px-3 py-2 rounded bg-green-600 text-white font-medium hover:opacity-90"
         >
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
+          +
+        </button>
       </div>
 
-      {/* Wallet Cards */}
-      <div className="flex flex-wrap gap-6 justify-center">
-        {walletCards.map((card) => {
-          const Icon = card.icon;
-
-          return (
-            <div
-              key={card.title}
-              className={`flex flex-col items-center justify-center p-5 rounded-2xl text-white shadow-lg w-60 cursor-pointer hover:scale-105 transition-transform`}
-              style={{ background: card.gradient }}
-            >
-              <div className="flex items-center space-x-3 mb-3">
-                <Icon size={36} />
-                <h2 className="text-lg font-semibold">{card.title}</h2>
-              </div>
-
-              {/* Checkbox Options */}
-              <div className="flex flex-col space-y-2 text-sm w-full">
-                {card.options.map((option) => {
-                  const isEditing = editingOptions[card.title]?.[option] || false;
-                  return (
-                    <div key={option} className="flex items-center justify-between">
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          disabled={!isEditing}
-                          checked={selectedOptions[card.title]?.includes(option) || false}
-                          onChange={() => handleCheckboxChange(card.title, option)}
-                          className="w-4 h-4 accent-white"
-                        />
-                        <span>{option}</span>
-                      </label>
-
-                      {/* Edit/Save Button per checkbox */}
-                      <button
-                        onClick={() => (isEditing ? handleSave(card.title, option) : toggleEdit(card.title, option))}
-                        className="px-2 py-1 text-xs bg-blue-600 rounded hover:bg-blue-700 transition"
-                      >
-                        {isEditing ? "Save" : "Edit"}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Navigate Button */}
-              <button
-                onClick={() => navigate(card.route, { state: { country: selectedCountry } })}
-                className="mt-4 px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition"
+      {/* ✅ List of added methods */}
+      <div className="mt-4">
+        {methods.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No payment methods added yet.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {methods.map((m) => (
+              <li
+                key={m.id}
+                className="flex items-center justify-between border rounded p-2 cursor-pointer hover:bg-gray-50"
               >
-                Go
-              </button>
-            </div>
-          );
-        })}
+                <div
+                  onClick={() => handlePaymentClick(m.text)}
+                  className="flex flex-col flex-1"
+                >
+                  <div className="text-sm font-medium">{m.text}</div>
+                  <div className="text-xs text-gray-500">
+                    {m.countryName} ({m.country})
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => removeMethod(m.id)}
+                  aria-label={`Remove ${m.text}`}
+                  className="px-3 py-1 rounded bg-red-600 text-white font-medium hover:bg-red-700"
+                >
+                  -
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
