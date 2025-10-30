@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { Edit, Repeat, Slash } from "lucide-react";
+import { useCryptoOption } from "../Store/cryptoOption";
 
 export default function AllDetailUser() {
+      const cryptoOption = useCryptoOption();
+
     const [user, setUser] = useState({
         id: "u_001",
         name: "Rahul Mehta",
@@ -153,15 +156,17 @@ export default function AllDetailUser() {
                             </tr>
                         </thead>
                         <tbody>
-                            {holdings.map((h) => (
-                                <tr key={h.id} className="border-t hover:bg-gray-50">
-                                    <td className="p-2">{h.name}</td>
-                                    <td className="p-2">{h.symbol}</td>
-                                    <td className="p-2">{h.qty}</td>
-                                    <td className="p-2">₹ {h.currentPrice.toLocaleString()}</td>
-                                    <td className="p-2">₹ {(h.qty * h.currentPrice).toLocaleString()}</td>
-                                </tr>
-                            ))}
+                           {cryptoOption.map((h) => (
+              <tr  className="border-t hover:bg-gray-50">
+                <td className="p-2">{h.shrotName}</td>
+                <td className="p-2">{h.shrotName}</td>
+                <td className="p-2">{h.pricePerCoin}</td>
+                <td className="p-2">₹   {`₹${(
+          ((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)
+        )} INR`}</td>
+                <td className="p-2">₹ {Number(h.blc ?? 0).toFixed(8)}</td>
+              </tr>
+            ))}
                         </tbody>
                     </table>
                 </div>

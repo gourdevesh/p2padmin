@@ -5,6 +5,9 @@ import { Dialog } from "@headlessui/react";
 import { db } from "./Config/firebaseConfig";
 import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
 import PredefinedMessageModal from "../Models/PredefinedMessageModal";
+import { useCryptoOption } from "./Store/cryptoOption";
+import { getTransactionDetails } from "../services/TransactionService";
+import { decryptData } from "../services/decryptService";
 
 interface Media {
   url: string;
@@ -101,8 +104,40 @@ export const DisputeDetail: React.FC = () => {
     // 🔹 TODO: API call to save result
     setOpenResultModal(false);
   };
+  const [holdings, setHoldings] = useState([
+    { id: "h_btc", name: "Bitcoin", symbol: "BTC", qty: 0.15, currentPrice: 4333333 },
+    { id: "h_eth", name: "Ethereum", symbol: "ETH", qty: 1.2, currentPrice: 183333 },
+    { id: "h_usdt", name: "Tether", symbol: "USDT", qty: 5000, currentPrice: 83 },
+  ]);
 
   // ---------------- Component Render ----------------
+
+
+  const cryptoOption = useCryptoOption();
+  const [tradeData, setTradeData] = useState<any>(null);
+
+    const fetchData = async (query: string = "", page: number = 1) => {
+          try {
+              const token = localStorage.getItem("authToken");
+              if (!token) throw new Error("No auth token found");
+  
+              const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
+              const data = await getTransactionDetails(token, finalQuery);
+  
+              if (data?.data) {
+                  const decrypted = await decryptData(data?.data, token);
+
+                  setTradeData(decrypted?.data || []);
+              }
+          } catch (err: any) {
+          }
+      };
+  
+      useEffect(() => {
+          fetchData();
+      }, []);
+      
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
       {/* Users */}
@@ -167,9 +202,9 @@ export const DisputeDetail: React.FC = () => {
                 </div>
                 <div className="flex items-center mt-1">
                   <p className="text-lg font-semibold text-white truncate">{dispute.reported}</p>
-               <p className="ml-3 text-xs text-white font-medium">
-  Total: ₹{dispute.price}
-</p>
+                  <p className="ml-3 text-xs text-white font-medium">
+                    Total: ₹{dispute.price}
+                  </p>
 
                   {dispute.result === "reported" && (
                     <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
@@ -214,6 +249,35 @@ export const DisputeDetail: React.FC = () => {
 
         </div>
       </div>
+
+      <div className="col-span-2 bg-white p-5 rounded-xl shadow-md overflow-x-auto">
+        <h2 className="font-semibold text-lg mb-3">Crypto Holdings</h2>
+        <table className="w-full text-sm border">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2 text-left">Coin</th>
+              <th className="p-2 text-left">Symbol</th>
+              <th className="p-2 text-left">Quantity</th>
+              <th className="p-2 text-left">Price</th>
+              <th className="p-2 text-left">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cryptoOption.map((h) => (
+              <tr className="border-t hover:bg-gray-50">
+                <td className="p-2">{h.shrotName}</td>
+                <td className="p-2">{h.shrotName}</td>
+                <td className="p-2">{h.pricePerCoin}</td>
+                <td className="p-2">₹   {`₹${(
+                  ((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)
+                )} INR`}</td>
+                <td className="p-2">₹ {Number(h.blc ?? 0).toFixed(8)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
 
 
 

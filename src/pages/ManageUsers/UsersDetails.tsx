@@ -8,7 +8,7 @@ import {
   Megaphone,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { getUserDetails, getUserDetailsbyId, updateUserNotification } from "../../services/userService";
 import { showToast } from "../../utils/toast";
@@ -172,29 +172,29 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const state = location.state as { data: RowType };
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
 
   const fetchUser = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("No auth token found");
-        if (!user_id) throw new Error("No user_id in params");
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
+      if (!user_id) throw new Error("No user_id in params");
 
-        const data = await getUserDetailsbyId(token, Number(user_id));
-        setUser(data); // full response {status, message, data, analytics}
-      } catch (err: any) {
-        showToast("error", err.message || "Failed to load user details");
-      } finally {
-        setLoading(false);
-      }
-    };
+      const data = await getUserDetailsbyId(token, Number(user_id));
+      setUser(data); // full response {status, message, data, analytics}
+    } catch (err: any) {
+      showToast("error", err.message || "Failed to load user details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   useEffect(() => {
-  
-  fetchUser();
+
+    fetchUser();
   }, [user_id]);
 
   const userDetail = user?.data;
@@ -238,7 +238,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
     setSelectedData(userDetail?.user)
   };
 
- const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
 
   const handleSend = async (formData: {
     title: string;
@@ -262,7 +262,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
       console.error("Error sending notification:", error);
     }
   };
-
+  console.log("User Detail Rendered:", userDetail);
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
@@ -271,14 +271,14 @@ const UserDetail: React.FC<UserDetailProps> = ({
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => console.log("Trade completed!")}
         selectedData={selectedData}
-        fetchUser ={fetchUser}
+        fetchUser={fetchUser}
       />
       {isOpen && (
         <NotificationModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           onSubmit={handleSend}
-          selectedData = {selectedData}
+          selectedData={selectedData}
         />
       )}
       {/* Header */}
@@ -287,6 +287,9 @@ const UserDetail: React.FC<UserDetailProps> = ({
           User Detail – {userDetail?.username ?? ""}
         </h2>
         <button
+          onClick={() => {
+            window.open(`http://localhost:5173/login?email=${encodeURIComponent( userDetail?.user?.email )}`, "_blank", "noopener,noreferrer");
+          }}
           className="border border-[#4b52ce] bg-white text-[#4b52ce] 
             px-4 py-1.5 rounded-md cursor-pointer 
             text-sm transition-colors duration-200 
@@ -369,38 +372,37 @@ const UserDetail: React.FC<UserDetailProps> = ({
           <span className="text-lg font-bold">≞</span>
           <span>Logins</span>
         </button>
-        <button     
-            onClick={handleNotification}
- className="flex-1 flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-md shadow">
+        <button
+          onClick={handleNotification}
+          className="flex-1 flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-md shadow">
           <span className="text-lg font-bold">🔔</span>
           <span>Notifications</span>
         </button>
-     <button
-  onClick={handleUpdateClick}
-  className={`flex-1 flex items-center justify-center space-x-2 px-5 py-3 rounded-md shadow text-white transition-all duration-200 
-    ${
-      userDetail?.user?.user_status === "active"
-        ? "bg-green-500 hover:bg-green-600"
-        : userDetail?.user?.user_status === "block"
-        ? "bg-red-500 hover:bg-red-600"
-        : userDetail?.user?.user_status === "terminate"
-        ? "bg-gray-500 hover:bg-gray-600"
-        : "bg-orange-400 hover:bg-orange-500"
-    }`}
->
-  <span className="text-lg font-bold">
-    {userDetail?.user?.user_status === "active"
-      ? "✅"
-      : userDetail?.user?.user_status === "block"
-      ? "🚫"
-      : userDetail?.user?.user_status === "terminate"
-      ? "⚫"
-      : "⚙️"}
-  </span>
-  <span className="capitalize font-semibold">
-    {userDetail?.user?.user_status || "Unknown"}
-  </span>
-</button>
+        <button
+          onClick={handleUpdateClick}
+          className={`flex-1 flex items-center justify-center space-x-2 px-5 py-3 rounded-md shadow text-white transition-all duration-200 
+    ${userDetail?.user?.user_status === "active"
+              ? "bg-green-500 hover:bg-green-600"
+              : userDetail?.user?.user_status === "block"
+                ? "bg-red-500 hover:bg-red-600"
+                : userDetail?.user?.user_status === "terminate"
+                  ? "bg-gray-500 hover:bg-gray-600"
+                  : "bg-orange-400 hover:bg-orange-500"
+            }`}
+        >
+          <span className="text-lg font-bold">
+            {userDetail?.user?.user_status === "active"
+              ? "✅"
+              : userDetail?.user?.user_status === "block"
+                ? "🚫"
+                : userDetail?.user?.user_status === "terminate"
+                  ? "⚫"
+                  : "⚙️"}
+          </span>
+          <span className="capitalize font-semibold">
+            {userDetail?.user?.user_status || "Unknown"}
+          </span>
+        </button>
 
       </div>
       <div className="overflow-x-auto bg-white dark:bg-gray-900 p-4 rounded-lg shadow mt-4">

@@ -53,22 +53,7 @@ const WalletPaymentCards: React.FC = () => {
     }
   };
 
-  // ✅ Payment click handler
-  const handlePaymentClick = (method: string) => {
-    if (method.toLowerCase() === "upi") {
-      navigate("/upi-payment");
-    } else if (method.toLowerCase() === "paypal") {
-      navigate("/upi-payment");
-    } else if (method.toLowerCase() === "bank") {
-      navigate("/international-payment");
-    }
-     else if (method.toLowerCase() === "visa") {
-      navigate("/visa");
-    } 
-    else {
-      alert(`No route defined for ${method}`);
-    }
-  };
+
 
   return (
     <div className="max-w-xxl mx-auto space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
@@ -144,7 +129,7 @@ const WalletPaymentCards: React.FC = () => {
                 className="flex items-center justify-between border rounded p-2 cursor-pointer hover:bg-gray-50"
               >
                 <div
-                  onClick={() => handlePaymentClick(m.text)}
+
                   className="flex flex-col flex-1"
                 >
                   <div className="text-sm font-medium">{m.text}</div>
