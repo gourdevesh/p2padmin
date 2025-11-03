@@ -78,12 +78,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       icon: 'Users',
       children: [
         { id: 'ActiveUsers', label: 'Active Users', icon: 'Users', path: '/ActiveUsers', badge: users?.active_users || 0 },
-        { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers' },
+        { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers',badge: users?.total_users || 0 },
         { id: 'banned', label: 'banned Users', icon: 'Users', path: '/banned', badge: users?.banned_users || 0 },
-        { id: 'EmailUnverified', label: 'Email Unverified', icon: 'Users', path: '/email-unverified', badge: users?.email_unverified || 0 },
-        { id: 'MobileUnverified', label: 'Mobile Unverified', icon: 'Users', path: '/mobile-unverified', badge: users?.mobile_unverified || 0 },
-        { id: 'kycUnverified', label: 'Kyc Unverified', icon: 'Users', path: '/kyc-unverified', badge: users?.kyc_unverified || 0 },
-        { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.kyc_pending || 0 },
+        { id: 'EmailUnverified', label: 'Email Unverified', icon: 'Users', path: '/email-unverified', badge: users?.total_email_unverifiedUsers || 0 },
+        { id: 'MobileUnverified', label: 'Mobile Unverified', icon: 'Users', path: '/mobile-unverified', badge: users?.total_number_unverifiedUsers || 0 },
+        { id: 'kycUnverified', label: 'Kyc Unverified', icon: 'Users', path: '/kyc-unverified', badge: users?.totalUnverifiedKycUsers || 0 },
+        { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
+        { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit'},
 
       ],
     },
@@ -191,6 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
 
 
+  console.log("users",users)
   return (
     <div className={`${isCollapsed ? 'w-16' : 'w-64'
       } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-screen `}>

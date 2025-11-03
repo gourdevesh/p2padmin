@@ -169,7 +169,7 @@ export const Disputes: React.FC = () => {
           </div>
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <User size={12} className="text-gray-400 mr-1" />
-            <span className='cursor-pointer' onClick={() => navigate("/All-detail-user") } >Reported: {row.reported}</span>
+            <span className='cursor-pointer' onClick={() => navigate("/All-detail-user")} >Reported: {row.reported}</span>
           </div>
         </div>
       ),

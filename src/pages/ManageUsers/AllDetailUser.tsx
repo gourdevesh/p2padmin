@@ -3,7 +3,7 @@ import { Edit, Repeat, Slash } from "lucide-react";
 import { useCryptoOption } from "../Store/cryptoOption";
 
 export default function AllDetailUser() {
-      const cryptoOption = useCryptoOption();
+    const cryptoOption = useCryptoOption();
 
     const [user, setUser] = useState({
         id: "u_001",
@@ -65,6 +65,10 @@ export default function AllDetailUser() {
             }))
         );
     };
+    const handleWarning = () => {
+        alert(`Warning sent to user }`);
+        // or open a modal / call API here
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
@@ -117,7 +121,7 @@ export default function AllDetailUser() {
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                     
+
                         <button
                             onClick={handleBlockToggle}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${user.status === "Active"
@@ -126,8 +130,13 @@ export default function AllDetailUser() {
                                 }`}
                         >
                             <Slash size={16} />
-                            {user.status === "Active" ? "Block User" : "Unblock"}
-                        </button>
+                                <button
+                                    onClick={() => handleWarning()}
+                                    className="text-yellow-600 hover:text-yellow-800 font-medium underline"
+                                >
+                                    Warning User
+                                </button>
+                                                  </button>
                     </div>
 
                     <div className="mt-4 text-sm text-gray-700">
@@ -156,17 +165,17 @@ export default function AllDetailUser() {
                             </tr>
                         </thead>
                         <tbody>
-                           {cryptoOption.map((h) => (
-              <tr  className="border-t hover:bg-gray-50">
-                <td className="p-2">{h.shrotName}</td>
-                <td className="p-2">{h.shrotName}</td>
-                <td className="p-2">{h.pricePerCoin}</td>
-                <td className="p-2">₹   {`₹${(
-          ((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)
-        )} INR`}</td>
-                <td className="p-2">₹ {Number(h.blc ?? 0).toFixed(8)}</td>
-              </tr>
-            ))}
+                            {cryptoOption.map((h) => (
+                                <tr className="border-t hover:bg-gray-50">
+                                    <td className="p-2">{h.shrotName}</td>
+                                    <td className="p-2">{h.shrotName}</td>
+                                    <td className="p-2">{h.pricePerCoin}</td>
+                                    <td className="p-2">₹   {`₹${(
+                                        ((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)
+                                    )} INR`}</td>
+                                    <td className="p-2">₹ {Number(h.blc ?? 0).toFixed(8)}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

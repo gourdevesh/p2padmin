@@ -55,8 +55,26 @@ export const AddressVerificationDetails: React.FC = () => {
     { key: "residence_country", label: "Country", sortable: true },
     { key: "residence_State", label: "State", sortable: true },
     { key: "address_line1", label: "Address Line 1" },
-    { key: "status", label: "Status", sortable: true },
-    { key: "remark", label: "Remark" },
+ {
+    key: "status",
+    label: "Status",
+    sortable: true,
+    render: (value: string) => (
+      <span
+        className={`px-2 py-1 rounded text-xs font-medium capitalize ${
+          value === "verified"
+            ? "bg-green-100 text-green-700"
+            : value === "pending"
+            ? "bg-yellow-100 text-yellow-700"
+            : value === "rejected"
+            ? "bg-red-100 text-red-700"
+            : "bg-gray-100 text-gray-700"
+        }`}
+      >
+        {value}
+      </span>
+    ),
+  },    { key: "remark", label: "Remark" },
     {
       key: "action",
       label: "Action",
@@ -81,6 +99,7 @@ export const AddressVerificationDetails: React.FC = () => {
           isOpen={isModalOpen}
           selectedData={selectedData}
           onClose={handleCloseModal}
+          fetchData={fetchData}
         />
       )}
       <div className="flex items-center justify-between">

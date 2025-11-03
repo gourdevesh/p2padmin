@@ -8,6 +8,8 @@ import PredefinedMessageModal from "../Models/PredefinedMessageModal";
 import { useCryptoOption } from "./Store/cryptoOption";
 import { getTransactionDetails } from "../services/TransactionService";
 import { decryptData } from "../services/decryptService";
+import CancelTradeModal from "../Models/CandelTradeModel";
+import NewTradeModal from "../Models/NewTradeModal";
 
 interface Media {
   url: string;
@@ -88,6 +90,24 @@ export const DisputeDetail: React.FC = () => {
   const [openReleaseModal, setOpenReleaseModal] = useState(false);
   const [openResultModal, setOpenResultModal] = useState(false);
   const [result, setResult] = useState("buyer");
+  const [openCancelModal, setOpenCancelModal] = React.useState(false);
+  const [tradeInfo, setTradeInfo] = useState<{
+    amount: string;
+    assetValue: string;
+    cryptocurrency: string;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleTrade = (data: any) => {
+    console.log("Trade data received:", data);
+    setTradeInfo(data);
+    alert("New trade created successfully!");
+  };
+
+  const handleCancelTrade = () => {
+    setOpenCancelModal(true);
+
+  }
 
   const handleSendPredefinedMessage = () => {
     console.log("Send message:", selectedMessage);
@@ -116,27 +136,27 @@ export const DisputeDetail: React.FC = () => {
   const cryptoOption = useCryptoOption();
   const [tradeData, setTradeData] = useState<any>(null);
 
-    const fetchData = async (query: string = "", page: number = 1) => {
-          try {
-              const token = localStorage.getItem("authToken");
-              if (!token) throw new Error("No auth token found");
-  
-              const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
-              const data = await getTransactionDetails(token, finalQuery);
-  
-              if (data?.data) {
-                  const decrypted = await decryptData(data?.data, token);
+  const fetchData = async (query: string = "", page: number = 1) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
 
-                  setTradeData(decrypted?.data || []);
-              }
-          } catch (err: any) {
-          }
-      };
-  
-      useEffect(() => {
-          fetchData();
-      }, []);
-      
+      const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
+      const data = await getTransactionDetails(token, finalQuery);
+
+      if (data?.data) {
+        const decrypted = await decryptData(data?.data, token);
+
+        setTradeData(decrypted?.data || []);
+      }
+    } catch (err: any) {
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
@@ -232,50 +252,150 @@ export const DisputeDetail: React.FC = () => {
 
           {/* Trade ID & Release Button */}
           <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
+            {/* Trade Info */}
             <div className="flex items-center gap-2">
               <CreditCard size={24} className="text-white/80" />
               <div>
                 <p className="text-sm text-white/70">Trade ID</p>
-                <p className="text-lg font-semibold text-white truncate">{dispute.tradeId}</p>
+                <p className="text-lg font-semibold text-white truncate">
+                  {dispute.tradeId}
+                </p>
               </div>
             </div>
-            <button
-              className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-              onClick={() => setOpenReleaseModal(true)}
-            >
-              Release Crypto
-            </button>
-          </div>
 
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <button
+                className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                onClick={() => setOpenReleaseModal(true)}
+              >
+                Release Crypto
+              </button>
+
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                onClick={handleCancelTrade}
+              >
+                Cancel Trade
+              </button>
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                onClick={() => setIsModalOpen(true)}
+              >
+                New Trade
+              </button>
+            </div>
+          </div>
+          <NewTradeModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onTrade={handleTrade}
+          />
+          <CancelTradeModal
+            isOpen={openCancelModal}
+            onClose={() => setOpenCancelModal(false)}
+            onConfirm={() => {
+              alert("Trade cancelled!");
+              setOpenCancelModal(false);
+              setTradeInfo(null);
+            }}
+          />
         </div>
       </div>
+      {tradeInfo && (
+        <div className="mt-8 max-full bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all hover:shadow-xl">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+            📊 Trade Summary
+          </h3>
 
-      <div className="col-span-2 bg-white p-5 rounded-xl shadow-md overflow-x-auto">
-        <h2 className="font-semibold text-lg mb-3">Crypto Holdings</h2>
-        <table className="w-full text-sm border">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">Coin</th>
-              <th className="p-2 text-left">Symbol</th>
-              <th className="p-2 text-left">Quantity</th>
-              <th className="p-2 text-left">Price</th>
-              <th className="p-2 text-left">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cryptoOption.map((h) => (
-              <tr className="border-t hover:bg-gray-50">
-                <td className="p-2">{h.shrotName}</td>
-                <td className="p-2">{h.shrotName}</td>
-                <td className="p-2">{h.pricePerCoin}</td>
-                <td className="p-2">₹   {`₹${(
-                  ((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)
-                )} INR`}</td>
-                <td className="p-2">₹ {Number(h.blc ?? 0).toFixed(8)}</td>
+          <div className="space-y-2 text-gray-700">
+            <p className="flex justify-between">
+              <span className="font-medium">💰 Amount (INR):</span>
+              <span className="font-semibold text-gray-900">
+                ₹{tradeInfo.amount}
+              </span>
+            </p>
+
+            <p className="flex justify-between">
+              <span className="font-medium">🪙 Cryptocurrency:</span>
+              <span className="font-semibold text-gray-900 uppercase">
+                {tradeInfo.cryptocurrency}
+              </span>
+            </p>
+
+            <p className="flex justify-between">
+              <span className="font-medium">📦 Asset Value:</span>
+              <span className="font-semibold text-green-600">
+                {tradeInfo.assetValue}
+              </span>
+            </p>
+          </div>
+
+          <div className="mt-5 text-sm text-gray-500 border-t pt-3">
+            Trade started successfully. View status in your dashboard 🚀
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* ✅ First Crypto Holdings Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto">
+          <h2 className="font-semibold text-lg mb-3">
+            Crypto Holdings — <span className="text-indigo-600">Mukesh</span>
+          </h2>    <table className="w-full text-sm border">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-left">Coin</th>
+                <th className="p-2 text-left">Symbol</th>
+                <th className="p-2 text-left">Quantity</th>
+                <th className="p-2 text-left">Price</th>
+                <th className="p-2 text-left">Value</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cryptoOption.map((h, index) => (
+                <tr key={index} className="border-t hover:bg-gray-50">
+                  <td className="p-2">{h.shrotName}</td>
+                  <td className="p-2">{h.shrotName}</td>
+                  <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
+                  <td className="p-2">₹ {h.pricePerCoin}</td>
+                  <td className="p-2">
+                    ₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ✅ Second Crypto Holdings Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto">
+          <h2 className="font-semibold text-lg mb-3">
+            Crypto Holdings — <span className="text-indigo-600">Devashish Rajbhar</span>
+          </h2>    <table className="w-full text-sm border">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-left">Coin</th>
+                <th className="p-2 text-left">Symbol</th>
+                <th className="p-2 text-left">Quantity</th>
+                <th className="p-2 text-left">Price</th>
+                <th className="p-2 text-left">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cryptoOption.map((h, index) => (
+                <tr key={index} className="border-t hover:bg-gray-50">
+                  <td className="p-2">{h.shrotName}</td>
+                  <td className="p-2">{h.shrotName}</td>
+                  <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
+                  <td className="p-2">₹ {h.pricePerCoin}</td>
+                  <td className="p-2">
+                    ₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
 

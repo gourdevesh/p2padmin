@@ -85,7 +85,7 @@ const WalletPaymentCards: React.FC = () => {
           options={countries}
           placeholder="Select a country..."
           isSearchable
-          className="flex-1 basis-0"
+          className="flex-1 basis-0 dark:text-black"
           styles={{
             control: (base) => ({
               ...base,
@@ -103,7 +103,7 @@ const WalletPaymentCards: React.FC = () => {
           value={paymentText}
           onChange={(e) => setPaymentText(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 basis-0 border rounded p-2"
+          className="flex-1 basis-0 border rounded p-2  dark:text-black"
         />
 
         <button

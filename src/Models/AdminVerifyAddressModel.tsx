@@ -8,6 +8,8 @@ interface BankDetailsModalProps {
   selectedData: any;
   onClose: () => void;
   onSuccess?: () => void;
+  fetchData?: () => void; // ✅ add this line
+
 }
 
 const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
@@ -15,6 +17,7 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
   onClose,
   selectedData,
   onSuccess,
+  fetchData
 }) => {
   const [id, setId] = useState<number>(0);
   const [status, setStatus] = useState<string>("pending");
@@ -45,6 +48,7 @@ const AdminVerifyAddressModel: React.FC<BankDetailsModalProps> = ({
       showToast("success", "] status updated successfully!");
       onSuccess?.();
       onClose();
+  fetchData?.(); 
     } catch (err: any) {
       showToast("error", err.message || "Failed to update  status");
     } finally {
