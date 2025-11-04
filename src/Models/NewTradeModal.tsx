@@ -33,6 +33,13 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   const priceRef = useRef<any>(null);
+  useEffect(() => {
+    if (isOpen) {
+      setAmount("");
+      setAssetValue("");
+      setCryptocurrency("bitcoin");
+    }
+  }, [isOpen]);
 
   // ✅ Fetch crypto prices
   useEffect(() => {
@@ -84,8 +91,8 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
 
   const currentRate = priceRef.current
     ? priceRef.current[
-        cryptocurrency === "binance" ? "binancecoin" : cryptocurrency
-      ]?.inr
+      cryptocurrency === "binance" ? "binancecoin" : cryptocurrency
+    ]?.inr
     : 0;
 
   return (

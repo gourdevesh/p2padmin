@@ -98,11 +98,11 @@ export const DisputeDetail: React.FC = () => {
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleTrade = (data: any) => {
-    console.log("Trade data received:", data);
-    setTradeInfo(data);
-    alert("New trade created successfully!");
-  };
+const handleTrade = (data: any) => {
+    alert("Previous trade canceled!");
+  setTradeInfo(data);
+  alert("New trade created successfully!");
+};
 
   const handleCancelTrade = () => {
     setOpenCancelModal(true);

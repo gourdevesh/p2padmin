@@ -45,11 +45,11 @@ export const AssetsDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(searchTerm, currentPage); // ✅ always pass page with query
+    fetchData(searchTerm, currentPage); 
   }, [currentPage]);
 
   const handleSearch = () => {
-    setCurrentPage(1); // search karte time page reset
+    setCurrentPage(1); 
     fetchData(searchTerm, 1);
   };
 
@@ -81,11 +81,7 @@ export const AssetsDetails: React.FC = () => {
         <button
           type="button"
           className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-          onClick={() =>
-            navigate(`/user-detail/${row.user_id}`, {
-              state: { data: row },
-            })
-          }
+        
         >
           Update
         </button>

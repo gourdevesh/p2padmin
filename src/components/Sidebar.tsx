@@ -78,13 +78,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       icon: 'Users',
       children: [
         { id: 'ActiveUsers', label: 'Active Users', icon: 'Users', path: '/ActiveUsers', badge: users?.active_users || 0 },
-        { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers',badge: users?.total_users || 0 },
+        { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers', badge: users?.total_users || 0 },
         { id: 'banned', label: 'banned Users', icon: 'Users', path: '/banned', badge: users?.banned_users || 0 },
         { id: 'EmailUnverified', label: 'Email Unverified', icon: 'Users', path: '/email-unverified', badge: users?.total_email_unverifiedUsers || 0 },
         { id: 'MobileUnverified', label: 'Mobile Unverified', icon: 'Users', path: '/mobile-unverified', badge: users?.total_number_unverifiedUsers || 0 },
         { id: 'kycUnverified', label: 'Kyc Unverified', icon: 'Users', path: '/kyc-unverified', badge: users?.totalUnverifiedKycUsers || 0 },
         { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
-        { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit'},
+        { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
+        { id: 'Id-Verification', label: 'Id-Verification', icon: 'Users', path: '/Id-Verification' },
+
 
       ],
     },
@@ -192,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
 
 
-  console.log("users",users)
+  console.log("users", users)
   return (
     <div className={`${isCollapsed ? 'w-16' : 'w-64'
       } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-screen `}>
@@ -223,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
             return (
               <li key={item.id}>
-                <button  
+                <button
                   onClick={() => item.children ? toggleExpand(item.id) : handleNavigation(item.path!)}
                   className={`w-full flex items-center  ${isCollapsed ? 'justify-center px-' : 'justify-start px-3'}  py-2.5 rounded-lg text-left transition-colors ${isActive
                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border-r-2 border-primary-500'
@@ -277,11 +279,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       </nav>
 
       {/* Theme Toggle */}
-<div
-  className={`${ 
-    isCollapsed ? 'p-2' : 'p-4 '
-  } border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800`}
->
+      <div
+        className={`${isCollapsed ? 'p-2' : 'p-4 '
+          } border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800`}
+      >
         <button
           onClick={toggleTheme}
           className="w-full flex items-center px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

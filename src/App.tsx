@@ -59,6 +59,7 @@ import CreateFeedBack from './pages/FeedBack/CreateFeedBack';
 import AllDetailUser from './pages/ManageUsers/AllDetailUser';
 import VisaPaymentForm from './pages/VisaPaymentForm';
 import UserTradeLimit from './pages/ManageUsers/UserTradeLimit';
+import IdVerification from './pages/ManageUsers/IdVerification';
 
 function AppRoutes() {
   const location = useLocation();
@@ -135,7 +136,9 @@ function AppRoutes() {
           <Route path="/UpdateWebsiteLogoFavicon" element={<UpdateWebsiteLogoFavicon />} />
           <Route path="/All-detail-user" element={<AllDetailUser />} />
           <Route path="/visa" element={<VisaPaymentForm />} />
-                    <Route path="/trade-limit" element={<UserTradeLimit />} />
+          <Route path="/Id-Verification" element={<IdVerification />} />
+          <Route path="/trade-limit" element={<UserTradeLimit />} />
+
 
 
 

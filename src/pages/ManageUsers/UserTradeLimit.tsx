@@ -16,7 +16,7 @@ Unverified User Limit: ₹${unverifiedLimit}`);
     return (
         <>
             <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
-                User Limit 
+                User Limit
 
                 <button
                     onClick={() => navigate(-1)}
@@ -32,15 +32,15 @@ Unverified User Limit: ₹${unverifiedLimit}`);
                 </button>
             </div>
             <div className="max-w-xxl mx-auto mt-5 bg-white rounded-2xl shadow-lg p-8">
-               
+
                 {/* Unverified User Limit */}
                 <div className="mb-6">
                     <label className="block text-gray-700 font-medium mb-2">
-                        Unverified User Limit (₹)
+                        Unverified User Limit
                     </label>
                     <input
                         type="number"
-                        value={unverifiedLimit}
+                        value={unverifiedLimit === 0 ? "" : unverifiedLimit}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setUnverifiedLimit(Number(e.target.value))
                         }
@@ -71,7 +71,7 @@ Unverified User Limit: ₹${unverifiedLimit}`);
                     onClick={handleSave}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg shadow-md transition-all duration-200"
                 >
-                    💾 Save Settings
+                    💾 Save
                 </button>
             </div>
         </>
