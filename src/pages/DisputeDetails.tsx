@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { User, CreditCard } from "lucide-react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { Dialog } from "@headlessui/react";
 import { db } from "./Config/firebaseConfig";
 import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
@@ -10,6 +10,7 @@ import { getTransactionDetails } from "../services/TransactionService";
 import { decryptData } from "../services/decryptService";
 import CancelTradeModal from "../Models/CandelTradeModel";
 import NewTradeModal from "../Models/NewTradeModal";
+import { cancelTrade } from "../services/TradeHistory";
 
 interface Media {
   url: string;
@@ -47,7 +48,7 @@ interface Dispute {
 
 export const DisputeDetail: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const tradeId = "tradeId:455";
+  const tradeId = "tradeId:456";
 
   const dispute: Dispute = {
     reporter: "Mukesh Rai",
@@ -98,11 +99,26 @@ export const DisputeDetail: React.FC = () => {
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-const handleTrade = (data: any) => {
-    alert("Previous trade canceled!");
-  setTradeInfo(data);
-  alert("New trade created successfully!");
-};
+  const handleTrade = async (data: any) => {
+    const confirmCancel = window.confirm("⚠️ Are you sure you want to cancel the previous trade?");
+
+    if (!confirmCancel) return; // user pressed "Cancel"
+
+    try {
+      alert("Previous trade canceled!");
+      await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
+
+      setTradeInfo(data);
+
+      await sendSystemMessage("⚠️ Admin has started a new trade for dispute resolution.");
+
+      alert("✅ New trade created successfully!");
+    } catch (error) {
+      console.error("Error handling trade:", error);
+      alert("Something went wrong while creating the new trade.");
+    }
+  };
+
 
   const handleCancelTrade = () => {
     setOpenCancelModal(true);
@@ -156,6 +172,28 @@ const handleTrade = (data: any) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const sendSystemMessage = async (text: string) => {
+    if (!tradeId) return;
+    try {
+      const messageRef = collection(db, "UserToUserChats", tradeId, "messages");
+      const timestamp = new Date().toISOString();
+      await addDoc(messageRef, {
+        text,
+        createdAt: timestamp,
+        user: {
+          firstName: "System",
+          role: "admin",
+        },
+        type: "system",
+      });
+      console.log("System message sent ✅");
+    } catch (error) {
+      console.error("Error sending system message:", error);
+    }
+  };
+
+
 
 
   return (
@@ -294,12 +332,26 @@ const handleTrade = (data: any) => {
           <CancelTradeModal
             isOpen={openCancelModal}
             onClose={() => setOpenCancelModal(false)}
-            onConfirm={() => {
-              alert("Trade cancelled!");
-              setOpenCancelModal(false);
-              setTradeInfo(null);
+            onConfirm={async () => {
+              if (!window.confirm("⚠️ Are you sure you want to cancel this trade?")) return;
+
+              try {
+                const tradeDto = { trade_id: 456 };
+                const token = localStorage.getItem("authToken");
+
+                // const response = await cancelTrade(tradeDto, token || "");
+                // alert("✅ Trade cancelled successfully!");
+
+                await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
+
+                setTradeInfo(null);
+                setOpenCancelModal(false);
+              } catch (err: any) {
+                alert(`❌ ${err.message}`);
+              }
             }}
           />
+
         </div>
       </div>
       {tradeInfo && (

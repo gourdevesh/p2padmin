@@ -86,8 +86,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
         { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
         { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
         { id: 'Id-Verification', label: 'Id-Verification', icon: 'Users', path: '/Id-Verification' },
-
-
       ],
     },
 
