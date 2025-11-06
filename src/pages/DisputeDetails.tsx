@@ -11,6 +11,7 @@ import { decryptData } from "../services/decryptService";
 import CancelTradeModal from "../Models/CandelTradeModel";
 import NewTradeModal from "../Models/NewTradeModal";
 import { cancelTrade } from "../services/TradeHistory";
+import { toast } from "react-toastify";
 
 interface Media {
   url: string;
@@ -48,7 +49,7 @@ interface Dispute {
 
 export const DisputeDetail: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const tradeId = "tradeId:456";
+  const tradeId = "tradeId:458";
 
   const dispute: Dispute = {
     reporter: "Mukesh Rai",
@@ -101,24 +102,22 @@ export const DisputeDetail: React.FC = () => {
 
   const handleTrade = async (data: any) => {
     const confirmCancel = window.confirm("⚠️ Are you sure you want to cancel the previous trade?");
-
-    if (!confirmCancel) return; // user pressed "Cancel"
+    if (!confirmCancel) return;
 
     try {
-      alert("Previous trade canceled!");
+      toast.info("⏳ Cancelling previous trade...");
       await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
 
       setTradeInfo(data);
 
       await sendSystemMessage("⚠️ Admin has started a new trade for dispute resolution.");
 
-      alert("✅ New trade created successfully!");
+      toast.success("✅ New trade created successfully!");
     } catch (error) {
       console.error("Error handling trade:", error);
-      alert("Something went wrong while creating the new trade.");
+      toast.error("❌ Something went wrong while creating the new trade.");
     }
   };
-
 
   const handleCancelTrade = () => {
     setOpenCancelModal(true);
@@ -133,6 +132,7 @@ export const DisputeDetail: React.FC = () => {
   const handleReleaseCrypto = () => {
     console.log("Crypto released to buyer ✅");
     setOpenReleaseModal(false);
+    toast.success("Crypto released to buyer successfully!");
   };
 
   const handleSaveResult = () => {
@@ -193,6 +193,7 @@ export const DisputeDetail: React.FC = () => {
     }
   };
 
+  console.log("messages", messages)
 
 
 
@@ -294,7 +295,7 @@ export const DisputeDetail: React.FC = () => {
             <div className="flex items-center gap-2">
               <CreditCard size={24} className="text-white/80" />
               <div>
-                <p className="text-sm text-white/70">Trade ID</p>
+                <p className="text-sm text-white/70">Trade_ID</p>
                 <p className="text-lg font-semibold text-white truncate">
                   {dispute.tradeId}
                 </p>
@@ -340,8 +341,7 @@ export const DisputeDetail: React.FC = () => {
                 const token = localStorage.getItem("authToken");
 
                 // const response = await cancelTrade(tradeDto, token || "");
-                // alert("✅ Trade cancelled successfully!");
-
+                toast.info("⏳ Cancelling trade...");
                 await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
 
                 setTradeInfo(null);

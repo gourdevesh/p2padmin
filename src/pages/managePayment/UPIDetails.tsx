@@ -97,13 +97,13 @@ const columns = [
         label: "UPI ID",
         sortable: true,
     },
-    {
-        key: "qr_code_url",
-        label: "QR Code",
-        render: (value: string) => (
-            <img src={value} alt="QR Code" className="h-12 w-12 object-contain" />
-        ),
-    },
+    // {
+    //     key: "qr_code_url",
+    //     label: "QR Code",
+    //     render: (value: string) => (
+    //         <img src={value} alt="QR Code" className="h-12 w-12 object-contain" />
+    //     ),
+    // },
     {
         key: "caption",
         label: "Caption",
