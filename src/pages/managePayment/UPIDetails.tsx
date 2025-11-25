@@ -11,7 +11,7 @@ import UpdateUPIStatusModel from "../../Models/UpdateUPIStatusModel";
 interface PaymentType {
     pd_id: number;
     user_id: number;
-    account_type: string;
+    upi_name: string;
     bank_account_country: string;
     currency: string;
     bank_name: string;
@@ -34,8 +34,9 @@ const UPIDetails: React.FC = () => {
     const [filters, setFilters] = useState({
         id: "",
         user_id: "",
-        account_type: "",
+        upi_name: "",
         status: "",
+        upi_id: ""
     });
 
 
@@ -48,11 +49,13 @@ const UPIDetails: React.FC = () => {
             const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
 
             const data = await getUpiDetail(token, finalQuery);
+            setPaymentDetail(data?.upi_details || {});
 
-            if (data?.upi_details) {
-                const decrypted = await decryptData(data?.upi_details, token);
-                setPaymentDetail(decrypted?.data || {});
-            }
+
+            // if (data?.upi_details) {
+            //     const decrypted = await decryptData(data?.upi_details, token);
+            //     setPaymentDetail(decrypted?.data || {});
+            // }
             setCurrentPage(data?.pagination?.current_page || 1);
             setTotalPages(data?.pagination?.last_page || 1);
             setTotalItems(data?.pagination?.total_items || 0);
@@ -71,114 +74,114 @@ const UPIDetails: React.FC = () => {
         let queryParams = new URLSearchParams();
         if (filters.id) queryParams.append("id", filters.id);
         if (filters.user_id) queryParams.append("user_id", filters.user_id);
-        if (filters.account_type) queryParams.append("account_type", filters.account_type);
+        if (filters.upi_name) queryParams.append("upi_name", filters.upi_name);
+        if (filters.upi_id) queryParams.append("upi_id", filters.upi_id);
         if (filters.status) queryParams.append("status", filters.status);
         fetchData(queryParams.toString(), 1);
     };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedData, setSelectedData] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedData, setSelectedData] = useState<number | null>(null);
 
-  // 🔹 Click handler to open modal with ID
-  const handleUpdateClick = (row: any) => {
-    setSelectedData(row);
-    setIsModalOpen(true);
-  };
+    // 🔹 Click handler to open modal with ID
+    const handleUpdateClick = (row: any) => {
+        setSelectedData(row);
+        setIsModalOpen(true);
+    };
 
 
-const columns = [
-    {
-        key: "upi_name",
-        label: "UPI Name",
-        sortable: true,
-    },
-    {
-        key: "upi_id",
-        label: "UPI ID",
-        sortable: true,
-    },
-    // {
-    //     key: "qr_code_url",
-    //     label: "QR Code",
-    //     render: (value: string) => (
-    //         <img src={value} alt="QR Code" className="h-12 w-12 object-contain" />
-    //     ),
-    // },
-    {
-        key: "caption",
-        label: "Caption",
-        sortable: true,
-    },
-    {
-        key: "is_primary",
-        label: "Primary",
-        render: (value: number) => (
-            <span className={`px-2 py-1 rounded-full text-white ${value === 1 ? "bg-green-500" : "bg-gray-500"}`}>
-                {value === 1 ? "Yes" : "No"}
-            </span>
-        ),
-    },
-    {
-        key: "status",
-        label: "Status",
-        sortable: true,
-        render: (value: string) => (
-            <span className={`px-2 py-1 rounded-full text-white ${
-                value === "pending"
-                    ? "bg-yellow-500"
-                    : value === "verified"
-                    ? "bg-green-500"
-                    : "bg-red-500"
-            }`}>
-                {value}
-            </span>
-        ),
-    },
-    {
-        key: "created_at",
-        label: "Created At",
-        sortable: true,
-        render: (value: string) => new Date(value).toLocaleDateString(),
-    },
-    {
-        key: "actions",
-        label: "Actions",
-        render: (value: any, row: PaymentType) => (
-            <button
-                type="button"
-                className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-                onClick={() => handleUpdateClick(row)}
-            >
-                Update
-            </button>
-        ),
-    },
-];
+    const columns = [
+        {
+            key: "upi_name",
+            label: "UPI Name",
+            sortable: true,
+        },
+        {
+            key: "upi_id",
+            label: "UPI ID",
+            sortable: true,
+        },
+        // {
+        //     key: "qr_code_url",
+        //     label: "QR Code",
+        //     render: (value: string) => (
+        //         <img src={value} alt="QR Code" className="h-12 w-12 object-contain" />
+        //     ),
+        // },
+        {
+            key: "caption",
+            label: "Caption",
+            sortable: true,
+        },
+        {
+            key: "is_primary",
+            label: "Primary",
+            render: (value: number) => (
+                <span className={`px-2 py-1 rounded-full text-white ${value === 1 ? "bg-green-500" : "bg-gray-500"}`}>
+                    {value === 1 ? "Yes" : "No"}
+                </span>
+            ),
+        },
+        {
+            key: "status",
+            label: "Status",
+            sortable: true,
+            render: (value: string) => (
+                <span className={`px-2 py-1 rounded-full text-white ${value === "pending"
+                        ? "bg-yellow-500"
+                        : value === "verified"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                    }`}>
+                    {value}
+                </span>
+            ),
+        },
+        {
+            key: "created_at",
+            label: "Created At",
+            sortable: true,
+            render: (value: string) => new Date(value).toLocaleDateString(),
+        },
+        {
+            key: "actions",
+            label: "Actions",
+            render: (value: any, row: PaymentType) => (
+                <button
+                    type="button"
+                    className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
+                    onClick={() => handleUpdateClick(row)}
+                >
+                    Update
+                </button>
+            ),
+        },
+    ];
 
 
     return (
         <div className="space-y-6">
-               <div className="flex flex-row items-center justify-between flex-wrap">
-        {/* Left side */}
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-             Upi Details
-        </h1>
+            <div className="flex flex-row items-center justify-between flex-wrap">
+                {/* Left side */}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Upi Details
+                </h1>
 
-        {/* Right side */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+                {/* Right side */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
        text-gray-800 dark:text-gray-200 font-medium 
        rounded-md shadow-sm border border-gray-300 dark:border-gray-600
        hover:bg-gray-200 dark:hover:bg-gray-600 
        transition-colors duration-200 focus:outline-none focus:ring-2 
        focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
-        >
-          <ArrowLeft className="mr-2 w-4 h-4" />
-          Back
-        </button>
-      </div>
-             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
+                >
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    Back
+                </button>
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                     Filter Upi Details
                 </h2>
@@ -205,21 +208,34 @@ const columns = [
                bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
 
+                    <input
+                        type="text"
+                        placeholder="UPI ID"
+                        value={filters.upi_id}
+                        onChange={(e) => setFilters({ ...filters, upi_id: e.target.value })}
+                        className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
+               bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+
+
                     {/* Account Type */}
                     <select
-                        value={filters.account_type}
-                        onChange={(e) => setFilters({ ...filters, account_type: e.target.value })}
+                        value={filters.upi_name}
+                        onChange={(e) => setFilters({ ...filters, upi_name: e.target.value })}
                         className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
                bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
-                        <option value="">Account Type</option>
-                        <option value="personal">Personal</option>
-                        <option value="business">Business</option>
-                        <option value="saving">Saving</option>
+
+                        <option value="">upi name</option>
+                        <option value="phonepe">Phonepe</option>
+                        <option value="gpay">gpay</option>
+                        <option value="paytm">paytm</option>
+                        <option value="amazone_pay"> Amazone Pay</option>
+
                     </select>
 
                     {/* Status */}
-                 <select
+                    {/* <select
   value={filters.status}
   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
   className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
@@ -229,7 +245,7 @@ const columns = [
   <option value="pending"> Pending</option>
   <option value="verified"> Verified</option>
   <option value="reject">Rejected</option>
-</select>
+</select> */}
 
 
                     {/* Apply Button */}
@@ -243,7 +259,7 @@ const columns = [
                     {/* Reset Button */}
                     <button
                         onClick={() => {
-                            setFilters({ id: "", user_id: "", account_type: "", status: "" });
+                            setFilters({ id: "", user_id: "", upi_name: "", status: "", upi_id: "" });
                             fetchData("", 1); // reset पर default data reload
                         }}
                         className="px-4 py-2 w-full bg-gray-200 dark:bg-gray-700 text-gray-800 
@@ -267,12 +283,12 @@ const columns = [
                 loading={loading}
                 totalItems={PaymentDetails.length}
             />
-             <UpdateUPIStatusModel
-        isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)} 
-  selectedData ={selectedData}
-  onSuccess ={fetchData}
-      />
+            <UpdateUPIStatusModel
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                selectedData={selectedData}
+                onSuccess={fetchData}
+            />
         </div>
     );
 };

@@ -18,9 +18,13 @@ export const Layout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={toggleSidebar} />
-      </div>
+   <div
+  className="hidden lg:block h-screen overflow-y-auto"
+  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+>
+  <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={toggleSidebar} />
+</div>
+
 
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (

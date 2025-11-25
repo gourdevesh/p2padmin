@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { Table } from "../../components/Table";
 import { showToast } from "../../utils/toast";
 import { getSupportTicket } from "../../services/SupportTicketService";
+import { useNavigate } from "react-router-dom";
 
 export const AnsweredTickets
     : React.FC = () => {
@@ -12,6 +13,7 @@ export const AnsweredTickets
         const [loading, setLoading] = useState(true);
         const [totalPages, setTotalPages] = useState(1);
         const [totalItems, setTotalItems] = useState(0);
+        const navigate  = useNavigate();
         const fetchData = async (query: string = "", page: number = 1) => {
             try {
                 setLoading(true);
@@ -125,7 +127,11 @@ export const AnsweredTickets
                     <button
                         type="button"
                         className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-                        onClick={() => console.log("Details of:", row)}
+                        onClick={() =>
+                            navigate(`/reply-ticket/${row.ticket_id}`, {
+                                state: { ticket_number: row.ticket_number },
+                            })
+                        }
                     >
                         Details
                     </button>

@@ -51,10 +51,40 @@ export const VerificationDetails: React.FC = () => {
 
   const columns = [
     { key: "residence_country", label: "Country", sortable: true },
+    { key: "user_id", label: "user Id", sortable: true },
     { key: "residence_State", label: "State", sortable: true },
     { key: "address_line1", label: "Address Line 1" },
+    {
+      key: "document_front_image",
+      label: "Front Image",
+      render: (value: string, row: any) => (
+        <a href={row.document_front_image} target="_blank" rel="noopener noreferrer">
+          <img
+            src={row.document_front_image}
+            alt="Front"
+            className="w-16 h-10 object-cover rounded border cursor-pointer"
+          />
+        </a>
+      ),
+    },
+
+    {
+      key: "document_back_image",
+      label: "Back Image",
+      render: (value: string, row: any) => (
+        <a href={row.document_back_image} target="_blank" rel="noopener noreferrer">
+          <img
+            src={row.document_back_image}
+            alt="Back"
+            className="w-16 h-10 object-cover rounded border cursor-pointer"
+          />
+        </a>
+      ),
+    },
+
     { key: "status", label: "Status", sortable: true },
     { key: "remark", label: "Remark" },
+
     {
       key: "action",
       label: "Action",
@@ -78,6 +108,7 @@ export const VerificationDetails: React.FC = () => {
           isOpen={isModalOpen}
           selectedData={selectedData}
           onClose={handleCloseModal}
+          fetchData={fetchData}
         />
       )}
       <div className="flex items-center justify-between">
@@ -87,6 +118,20 @@ export const VerificationDetails: React.FC = () => {
 
         {/* Status Filter */}
         <div className="flex items-center space-x-2">
+          <label
+            htmlFor="country"
+            className="text-lg font-medium text-gray-700 dark:text-gray-300"
+          >
+            Country:
+          </label>
+          <select
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="">All Countries</option>
+            <option value="India">India</option>
+            <option value="USA">USA</option>
+            <option value="UK">UK</option>
+          </select>
           <label
             htmlFor="status"
             className="text-lg font-medium text-gray-700 dark:text-gray-300"

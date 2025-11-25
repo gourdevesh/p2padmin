@@ -27,10 +27,10 @@ const SystemSettings: React.FC = () => {
   }, [])
   console.log("websiteData", websiteData)
   const columns = [
-    { key: "websiteName", label: "Website Name", sortable: true },
-    { key: "websiteTitle", label: "Website Title", sortable: true },
+    { key: "website_name", label: "Website Name", sortable: true },
+    { key: "website_title", label: "Website Title", sortable: true },
 {
-  key: "websiteUrl",
+  key: "website_url",
   label: "Website URL",
   sortable: true,
   render: (row:any) => (
@@ -46,7 +46,7 @@ const SystemSettings: React.FC = () => {
 },
 
     {
-      key: "logoImageUrl",
+      key: "logo_image",
       label: "Logo",
       render: (row: any) => (
         <img
@@ -56,7 +56,7 @@ const SystemSettings: React.FC = () => {
       ),
     },
     {
-      key: "faviconImageUrl",
+      key: "favicon_image",
       label: "favicon",
       render: (value: string) => (
         <img src={value} alt="favicon" className="h-12 w-12 object-contain" />

@@ -200,160 +200,134 @@ export const DisputeDetail: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
       {/* Users */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl">
+  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
 
-          {/* Reporter & Reported */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full md:w-auto">
+    {/* LEFT SECTION — Reporter & Reported */}
+    <div className="flex flex-col lg:flex-row gap-8 w-full">
 
-            {/* Reporter */}
-            <div className="flex items-center gap-2 min-w-0">
-              <User size={24} className="text-white" />
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center">
-                  <p className="text-sm text-white/70">Reporter</p>
+      {/* Reporter */}
+      <div className="flex items-center gap-3 min-w-0">
+        <User size={26} className="text-white" />
 
-                  <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                    {dispute.status === "pending" ? "Buyer" : ""}
-                  </span>
-                  <button
-                    className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-lg"
-                    onClick={() => setOpenPredefinedModal(true)}
-                  >
-                    Message
-                  </button>
-                </div>
-                <div className="flex items-center mt-1">
-                  <p className="text-lg font-semibold text-white truncate">{dispute.reporter}</p>
-                  <p className="ml-3 text-xs text-white">
-                    Total: ₹{dispute.price}
-                  </p>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-white/70">Reporter</p>
 
-                  {dispute.result === "reporter" && (
-                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-                  )}
-                  {dispute.result === "reported" && (
-                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-                  )}
+            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+              Buyer
+            </span>
 
-
-                </div>
-              </div>
-            </div>
-
-            {/* Reported */}
-            <div className="flex items-center gap-3 min-w-0">
-              <User size={24} className="text-white" />
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center ">
-                  <p className="text-sm text-white/70">Reported</p>
-
-
-                  <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                    {dispute.status === "pending" ? "Seller" : ""}
-                  </span>
-                  <button
-                    className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
-                    onClick={() => setOpenPredefinedModal(true)}
-                  >
-                    Message
-                  </button>
-                </div>
-                <div className="flex items-center mt-1">
-                  <p className="text-lg font-semibold text-white truncate">{dispute.reported}</p>
-                  <p className="ml-3 text-xs text-white font-medium">
-                    Total: ₹{dispute.price}
-                  </p>
-
-                  {dispute.result === "reported" && (
-                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-                  )}
-                  {dispute.result === "reporter" && (
-                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
+              onClick={() => setOpenPredefinedModal(true)}
+            >
+              Message
+            </button>
           </div>
 
-          <ReleaseCryptoModal
-            isOpen={openReleaseModal}
-            onClose={() => setOpenReleaseModal(false)}
-            onConfirm={handleReleaseCrypto}
-            buyerName={dispute.reporter} // dynamically show buyer
-          />
-          <PredefinedMessageModal
-            isOpen={openPredefinedModal}
-            onClose={() => setOpenPredefinedModal(false)}
-            onSend={handleSendPredefinedMessage}
-          />
+          <div className="flex flex-wrap items-center mt-1 gap-2">
+            <p className="text-lg font-semibold text-white truncate max-w-[130px]">
+              {dispute.reporter}
+            </p>
 
-          {/* Trade ID & Release Button */}
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
-            {/* Trade Info */}
-            <div className="flex items-center gap-2">
-              <CreditCard size={24} className="text-white/80" />
-              <div>
-                <p className="text-sm text-white/70">Trade_ID</p>
-                <p className="text-lg font-semibold text-white truncate">
-                  {dispute.tradeId}
-                </p>
-              </div>
-            </div>
+            <span className="text-xs text-white">Total: ₹{dispute.price}</span>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <button
-                className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-                onClick={() => setOpenReleaseModal(true)}
-              >
-                Release Crypto
-              </button>
-
-              <button
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-                onClick={handleCancelTrade}
-              >
-                Cancel Trade
-              </button>
-              <button
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-                onClick={() => setIsModalOpen(true)}
-              >
-                New Trade
-              </button>
-            </div>
+            {dispute.result === "reporter" && (
+              <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">
+                Win
+              </span>
+            )}
+            {dispute.result === "reported" && (
+              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                Lose
+              </span>
+            )}
           </div>
-          <NewTradeModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onTrade={handleTrade}
-          />
-          <CancelTradeModal
-            isOpen={openCancelModal}
-            onClose={() => setOpenCancelModal(false)}
-            onConfirm={async () => {
-              if (!window.confirm("⚠️ Are you sure you want to cancel this trade?")) return;
-
-              try {
-                const tradeDto = { trade_id: 456 };
-                const token = localStorage.getItem("authToken");
-
-                // const response = await cancelTrade(tradeDto, token || "");
-                toast.info("⏳ Cancelling trade...");
-                await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
-
-                setTradeInfo(null);
-                setOpenCancelModal(false);
-              } catch (err: any) {
-                alert(`❌ ${err.message}`);
-              }
-            }}
-          />
-
         </div>
       </div>
+
+      {/* Reported */}
+      <div className="flex items-center gap-3 min-w-0">
+        <User size={26} className="text-white" />
+
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-white/70">Reported</p>
+
+            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+              Seller
+            </span>
+
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
+              onClick={() => setOpenPredefinedModal(true)}
+            >
+              Message
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center mt-1 gap-2">
+            <p className="text-lg font-semibold text-white truncate max-w-[130px]">
+              {dispute.reported}
+            </p>
+
+            <span className="text-xs text-white">Total: ₹{dispute.price}</span>
+
+            {dispute.result === "reported" && (
+              <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">
+                Win
+              </span>
+            )}
+            {dispute.result === "reporter" && (
+              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                Lose
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* RIGHT SECTION — Trade Info & Buttons */}
+    <div className="flex flex-col lg:flex-row gap-4 lg:items-center w-full lg:w-auto">
+
+      {/* Trade ID */}
+      <div className="flex items-center gap-2">
+        <CreditCard size={26} className="text-white/80" />
+        <div>
+          <p className="text-sm text-white/70">Trade_ID</p>
+          <p className="text-lg font-semibold text-white">{dispute.tradeId}</p>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-3">
+        <button
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+          onClick={() => setOpenReleaseModal(true)}
+        >
+          Release Crypto
+        </button>
+
+        <button
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+          onClick={handleCancelTrade}
+        >
+          Cancel Trade
+        </button>
+
+        <button
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+          onClick={() => setIsModalOpen(true)}
+        >
+          New Trade
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
       {tradeInfo && (
         <div className="mt-8 max-full bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all hover:shadow-xl">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">

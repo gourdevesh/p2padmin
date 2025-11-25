@@ -48,10 +48,13 @@ const PaymentDetails: React.FC = () => {
 
             const data = await getPaymentDetail(token, finalQuery);
 
-            if (data?.payment_details) {
-                const decrypted = await decryptData(data?.payment_details, token);
-                setPaymentDetail(decrypted?.data || {});
-            }
+                             setPaymentDetail(data?.payment_details || {});
+
+
+            // if (data?.payment_details) {
+            //     const decrypted = await decryptData(data?.payment_details, token);
+            //     setPaymentDetail(decrypted?.data || {});
+            // }
             setCurrentPage(data?.pagination?.current_page || 1);
             setTotalPages(data?.pagination?.last_page || 1);
             setTotalItems(data?.pagination?.total_items || 0);
@@ -205,7 +208,7 @@ const PaymentDetails: React.FC = () => {
                         <option value="">Account Type</option>
                         <option value="personal">Personal</option>
                         <option value="business">Business</option>
-                        <option value="saving">Saving</option>
+                        {/* <option value="saving">Saving</option> */}
                     </select>
 
                     {/* Status */}

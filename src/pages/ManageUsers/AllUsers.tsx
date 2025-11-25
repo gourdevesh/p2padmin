@@ -4,30 +4,43 @@ import { Table } from "../../components/Table";
 import { getUserDetails } from "../../services/userService";
 import { showToast } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
+import { SidebarStatusCard } from "../../components/UserStatusCard";
+import { Users } from "lucide-react";
 
 export const AllUsers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate()
 
-  const fetchData = async (query: string = "", page: number = 1) => {
+  console.log("users23", users)
+
+  const fetchData = async (query: string = "",  status: string = "", page: number = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
 
       // ✅ Page query ke andar hi bhejna
-      const finalQuery = `page=${page}${query ? `&search=${query}` : ""
-        }`;
+   
+const finalQuery =
+  `page=${page}` +
+  `${query ? `&search=${query}` : ""}` +
+  `${status ? `&status=${status}` : ""}`;
 
       const data = await getUserDetails(token, finalQuery);
 
+      const analytics = data?.analytics;
+      setAnalytics(analytics);
+
       const users = data?.data?.map((item: any) => item.user_details) || [];
       setUsers(users);
+
 
       setCurrentPage(data?.pagination?.current_page || 1);
       setTotalPages(data?.pagination?.last_page || 1);
@@ -39,14 +52,15 @@ export const AllUsers: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData(searchTerm, currentPage); // ✅ always pass page with query
-  }, [currentPage]);
 
-  const handleSearch = () => {
-    setCurrentPage(1); // search karte time page reset
-    fetchData(searchTerm, 1);
-  };
+useEffect(() => {
+  fetchData(searchTerm,statusFilter,currentPage);
+}, [currentPage]);
+
+const handleSearch = () => {
+  setCurrentPage(1);
+  fetchData(searchTerm,statusFilter,1);
+};
 
 
   const columns = [
@@ -70,6 +84,84 @@ export const AllUsers: React.FC = () => {
     },
     { key: "email", label: "Email", sortable: true },
     { key: "country", label: "Country", sortable: true },
+    { key: "user_status", label: "user_status", sortable: true },
+    {
+      key: "email_verified",
+      label: "Email Verified",
+      sortable: true,
+      render: (value: boolean) =>
+        value ? (
+          <span className="px-2 py-1 text-xs rounded bg-green-500 text-white">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs rounded bg-red-500 text-white">
+            Not Verified
+          </span>
+        )
+    },
+    {
+      key: "phone_verified",
+      label: "Phone Verified",
+      sortable: true,
+      render: (value: boolean) =>
+        value ? (
+          <span className="px-2 py-1 text-xs rounded bg-green-500 text-white">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs rounded bg-red-500 text-white">
+            Not Verified
+          </span>
+        )
+    },
+    {
+      key: "id_verified",
+      label: "ID Verified",
+      sortable: true,
+      render: (value: boolean) =>
+        value ? (
+          <span className="px-2 py-1 text-xs rounded bg-green-500 text-white">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs rounded bg-red-500 text-white">
+            Not Verified
+          </span>
+        )
+    },
+    {
+      key: "address_verified",
+      label: "Address Verified",
+      sortable: true,
+      render: (value: boolean) =>
+        value ? (
+          <span className="px-2 py-1 text-xs rounded bg-green-500 text-white">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs rounded bg-red-500 text-white">
+            Not Verified
+          </span>
+        )
+    },
+
+    {
+      key: "twoFactorAuth",
+      label: "twoFactorAuth",
+      sortable: true,
+      render: (value: boolean) =>
+        value ? (
+          <span className="px-2 py-1 text-xs rounded bg-green-500 text-white">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs rounded bg-red-500 text-white">
+            Not Verified
+          </span>
+        )
+    },
+
     {
       key: "last_login",
       label: "Joined At",
@@ -98,29 +190,93 @@ export const AllUsers: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <SidebarStatusCard
+          label="Email Unverified"
+          count={10}
+          icon={Users}
+          color="purple"
+          path="/email-unverified"
+        />
+
+        <SidebarStatusCard
+          label="Mobile Unverified"
+          count={20}
+          icon={Users}
+          color="blue"
+          path="/mobile-unverified"
+        />
+
+        <SidebarStatusCard
+          label="KYC Unverified"
+          count={5}
+          icon={Users}
+          color="red"
+          path="/kyc-unverified"
+        />
+
+        <SidebarStatusCard
+          label="KYC Pending"
+          count={7}
+          icon={Users}
+          color="yellow"
+          path="/kyc-pending"
+        />
+      </div>
+
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           All Users
         </h1>
-        <div className="flex items-center space-x-3">
-          <div className="flex flex-1">
-            <input
-              type="text"
-              placeholder="Username / Email"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <button
-              type="button"
-              onClick={handleSearch}
-              className="px-4 bg-primary-500 text-white rounded-r-lg hover:bg-primary-600 focus:outline-none flex items-center justify-center border border-primary-500"
-            >
-              <Search size={16} />
-            </button>
-          </div>
-        </div>
+      <div className="flex items-center space-x-3">
+
+  {/* Status Filter */}
+  <div>
+    <select
+      value={statusFilter}
+onChange={(e) => {
+  const value = e.target.value;
+  setStatusFilter(value);
+  setCurrentPage(1);
+  fetchData(searchTerm, value, 1);
+}}
+      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+    >
+     <option value="">All Status</option>
+
+  <option value="active_users">Active</option>
+  <option value="banned_users">Blocked</option>
+
+  <option value="unverified_email_users">Unverified Email</option>
+  <option value="unverified_number_users">Unverified Number</option>
+
+  <option value="unverified_kyc_users">Unverified KYC</option>
+  <option value="pending_kyc_users">Pending KYC</option>
+    </select>
+  </div>
+
+  {/* Search Box */}
+  <div className="flex flex-1">
+    <input
+      type="text"
+      placeholder="Username / Email"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="pl-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+    />
+    <button
+      type="button"
+      onClick={handleSearch}
+      className="px-4 bg-primary-500 text-white rounded-r-lg hover:bg-primary-600 focus:outline-none flex items-center justify-center border border-primary-500"
+    >
+      <Search size={16} />
+    </button>
+  </div>
+
+</div>
+
+
       </div>
 
       {/* Table + Pagination */}

@@ -25,13 +25,15 @@ export const Setting: React.FC = () => {
       if (!token) throw new Error("No auth token found");
 
       const res = await getSettingData(token);
-      if (res?.data) {
-        const decrypted = await decryptData(res.data, token);
-        setData(Array.isArray(decrypted?.data) ? decrypted.data : decrypted?.data ? [decrypted.data] : []);
-      }
-      else {
-        setData([]);
-      }
+              setData(Array.isArray(res?.data) ? res.data : res?.data ? [res.data] : []);
+
+      // if (res?.data) {
+      //   const decrypted = await decryptData(res.data, token);
+      //   setData(Array.isArray(decrypted?.data) ? decrypted.data : decrypted?.data ? [decrypted.data] : []);
+      // }
+      // else {
+      //   setData([]);
+      // }
     } catch (err: any) {
       showToast("error", err.message);
       setData([]);
@@ -47,7 +49,9 @@ export const Setting: React.FC = () => {
   console.log("data", data)
   const columns = [
     { key: "depositStatus", label: "depositStatus", sortable: true },
-    { key: "maxWithdraw", label: "maxWithdraw", sortable: true },
+    { key: "max_withdraw", label: "maxWithdraw", sortable: true },
+        { key: "min_withdraw", label: "min withdraw", sortable: true },
+
     {
       key: "user_registration",
       label: "user_registration",

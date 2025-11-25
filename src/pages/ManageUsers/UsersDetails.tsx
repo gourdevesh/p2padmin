@@ -237,6 +237,29 @@ const UserDetail: React.FC<UserDetailProps> = ({
     setIsOpen(true);
     setSelectedData(userDetail?.user)
   };
+const StatusButton = ({ value }: { value: boolean }) => {
+  const isTrue = value === true;
+
+  return (
+    <button
+      type="button"
+      className={`w-full py-3 text-white rounded-md relative
+        ${isTrue ? "bg-green-500" : "bg-red-500"}
+      `}
+    >
+      {isTrue ? "Verified" : "Unverified"}
+
+      <span
+        className={`absolute top-0 right-0 h-full w-2 rounded-tr-md rounded-br-md
+          ${isTrue
+            ? "bg-gradient-to-l from-green-700 to-green-500"
+            : "bg-gradient-to-l from-red-700 to-red-500"
+          }
+        `}
+      ></span>
+    </button>
+  );
+};
 
   const token = localStorage.getItem("authToken");
 
@@ -263,7 +286,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
     }
   };
   console.log("User Detail Rendered:", userDetail);
-
+console.log("user?.data?.user",user?.data?.user)
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
       <UpdateUserStatusModel
@@ -621,56 +644,38 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div>
-                  <label className="block mb-2 text-gray-700">Email Verification</label>
-                  <button
-                    type="button"
-                    className="w-full py-3 bg-green-500 text-white rounded-md relative"
-                  >
-                    Verified
-                    <span className="absolute top-0 right-0 h-full w-2 bg-gradient-to-l from-green-700 to-green-500 rounded-tr-md rounded-br-md"></span>
-                  </button>
-                </div>
-                <div>
-                  <label className="block mb-2 text-gray-700">Mobile Verification</label>
-                  <button
-                    type="button"
-                    className="w-full py-3 bg-green-500 text-white rounded-md relative"
-                  >
-                    Verified
-                    <span className="absolute top-0 right-0 h-full w-2 bg-gradient-to-l from-green-700 to-green-500 rounded-tr-md rounded-br-md"></span>
-                  </button>
-                </div>
-                <div>
-                  <label className="block mb-2 text-gray-700">2FA Verification</label>
-                  <button
-                    type="button"
-                    className="w-full py-3 bg-red-500 text-white rounded-md relative"
-                  >
-                    Disable
-                    <span className="absolute top-0 right-0 h-full w-2 bg-gradient-to-l from-red-700 to-red-500 rounded-tr-md rounded-br-md"></span>
-                  </button>
-                </div>
-                <div>
-                  <label className="block mb-2 text-gray-700">KYC</label>
-                  <button
-                    type="button"
-                    className="w-full py-3 bg-green-500 text-white rounded-md relative"
-                  >
-                    Verified
-                    <span className="absolute top-0 right-0 h-full w-2 bg-gradient-to-l from-green-700 to-green-500 rounded-tr-md rounded-br-md"></span>
-                  </button>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+  
+  <div>
+    <label className="block mb-2 text-gray-700">Email Verification</label>
+    <StatusButton value={user?.data?.user?.email_verified} />
+  </div>
+
+  <div>
+    <label className="block mb-2 text-gray-700">Mobile Verification</label>
+    <StatusButton value={user?.data?.user?.phone_verified} />
+  </div>
+
+  <div>
+    <label className="block mb-2 text-gray-700">2FA Verification</label>
+    <StatusButton value={user?.data?.user?.twoFactorAuth} />
+  </div>
+
+  <div>
+    <label className="block mb-2 text-gray-700">KYC</label>
+    <StatusButton value={user?.data?.user?.id_verified} />
+  </div>
+
+</div>
+
 
               {/* Submit button */}
-              <button
+              {/* <button
                 type="submit"
                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
               >
                 Submit
-              </button>
+              </button> */}
             </Form>
           )}
         </Formik>

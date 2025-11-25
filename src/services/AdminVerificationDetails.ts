@@ -48,12 +48,15 @@ export const updatEverifyAddress = async (token: string, body: { id: number; sta
         );
         return data;
     } catch (error: any) {
-        const msg =
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to update payment status";
-        throw new Error(msg);
-    }
+  const msg =
+    error.response?.data?.errors?.status?.[0] ||   // <-- nested error message
+    error.response?.data?.message ||               // backend message
+    error.message ||                               // default error
+    "Failed to update payment status";
+
+  throw new Error(msg);
+}
+
 };
 
 export const idVerificationDetails = async (token: string, body: { id: number; status: string; remark?: string }) => {
@@ -69,10 +72,12 @@ export const idVerificationDetails = async (token: string, body: { id: number; s
         );
         return data;
     } catch (error: any) {
-        const msg =
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to update payment status";
-        throw new Error(msg);
-    }
+  const msg =
+    error.response?.data?.errors?.status?.[0] ||   // <-- nested error message
+    error.response?.data?.message ||               // backend message
+    error.message ||                               // default error
+    "Failed to update payment status";
+
+  throw new Error(msg);
+}
 };

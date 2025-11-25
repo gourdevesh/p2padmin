@@ -60,7 +60,8 @@ import AllDetailUser from './pages/ManageUsers/AllDetailUser';
 import VisaPaymentForm from './pages/VisaPaymentForm';
 import UserTradeLimit from './pages/ManageUsers/UserTradeLimit';
 import IdVerification from './pages/ManageUsers/IdVerification';
-
+import { UsersAddressVerifications } from './pages/ManageUsers/UserAddressVerifications';
+import { NewUserRegistration } from './pages/ManageUsers/NewUserRegistration';
 function AppRoutes() {
   const location = useLocation();
 
@@ -81,6 +82,10 @@ function AppRoutes() {
           <Route path="/mobile-unverified" element={<MobileUnverifiedUsers />} />
           <Route path="/email-unverified" element={<EmailUnverifiedUsers />} />
           <Route path="/user-detail/:user_id" element={<UserDetail />} />
+          <Route path="/address_verifications" element={<UsersAddressVerifications />} />
+          <Route path="/new_registration" element={<NewUserRegistration />} />
+
+
 
           {/* Support Tickets */}
           <Route path="/pending-tickets" element={<PendingTickets />} />
@@ -100,16 +105,6 @@ function AppRoutes() {
           <Route path="/update-setting" element={<UpdateSetting />} />
           <Route path="/feedBack" element={<FeedBack />} />
           <Route path="/create-feedback" element={<CreateFeedBack />} />
-
-
-
-
-
-
-
-
-
-
 
 
 

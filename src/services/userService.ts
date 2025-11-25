@@ -82,3 +82,23 @@ export const updateUserNotification = async (
     throw new Error(msg);
   }
 };
+
+
+
+
+export const getUserAddressVerificationDetails = async (token: string, query: string = "",) => {
+    try {
+        const { data } = await api.get(`https://api.onnbit.com/api/address/get-address-verification`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return data;
+    } catch (error: any) {
+        const msg =
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to fetch user details";
+        throw new Error(msg);
+    }
+};

@@ -60,7 +60,7 @@ const IdVerification: React.FC = () => {
             {/* Header */}
             <div className="flex flex-row items-center justify-between flex-wrap">
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Id Verification
+                    Address Vise Verification
                 </h1>
 
                 <button

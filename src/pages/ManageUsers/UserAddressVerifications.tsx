@@ -1,81 +1,88 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { Table } from "../../components/Table";
-import { getUserDetails } from "../../services/userService";
-import { showToast } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
-import { getAssetsDetails } from "../../services/AssetsDetailsService";
-import { decryptData } from "../../services/decryptService";
+import UserVerifyAddressModel from "../../Models/UserVerifyAddressModel";
 
-export const AssetsDetails: React.FC = () => {
+export const UsersAddressVerifications: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [assetsDetails, setAssetsDetails] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+  const [totalPages] = useState(1);
+  const [totalItems] = useState(3);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const fetchData = async (query: string = "", page: number = 1) => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No auth token found");
-
-      // ✅ Page query ke andar hi bhejna
-      const finalQuery = `page=${page}${query ? `&search=${query}` : ""
-        }`;
-
-      const data = await getAssetsDetails(token, finalQuery);
-                            setAssetsDetails(data?.data || {});
-
-
-      //  if (data?.data) {
-      //                 const decrypted = await decryptData(data?.data, token);
-      //                 setAssetsDetails(decrypted?.data || {});
-      //             }
-
-     
-      setCurrentPage(data?.pagination?.current_page || 1);
-      setTotalPages(data?.pagination?.last_page || 1);
-      setTotalItems(data?.pagination?.total_items || 0);
-    } catch (err: any) {
-      showToast("error", err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData(searchTerm, currentPage); 
-  }, [currentPage]);
+  // ✅ Static Dummy Data
+  const users = [
+    {
+      user_id: 1,
+      name: "Rahul Sharma",
+      email: "rahul.sharma@example.com",
+      country: "India",
+      last_login: "2024-10-01T10:30:00Z",
+    },
+    {
+      user_id: 2,
+      name: "Neha Verma",
+      email: "neha.verma@example.com",
+      country: "India",
+      last_login: "2024-09-28T15:20:00Z",
+    },
+    {
+      user_id: 3,
+      name: "John Doe",
+      email: "john.doe@example.com",
+      country: "USA",
+      last_login: "2024-09-20T09:45:00Z",
+    },
+  ];
 
   const handleSearch = () => {
-    setCurrentPage(1); 
-    fetchData(searchTerm, 1);
+    console.log("Searching for:", searchTerm);
   };
 
+  const handleOpenModal = (user: any) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+    setIsModalOpen(false);
+  };
 
   const columns = [
     {
-      key: "	total_withdraw",
-      label: "	total_withdraw",
+      key: "name",
+      label: "User",
       sortable: true,
       render: (value: string, row: any) => (
         <div className="flex items-center">
-
           <div className="ml-3">
             <p className="font-medium text-gray-900 dark:text-white">
-              {row?.name || row?.	total_withdraw}
+              {row?.name}
             </p>
-           
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {row?.email || "N/A"}
+            </p>
           </div>
         </div>
       ),
     },
-    { key: "withdrawal_type", label: "withdrawal_type", sortable: true },
-    { key: "status", label: "status", sortable: true },
-   
+    {
+      key: "country",
+      label: "Country",
+      sortable: true,
+    },
+    {
+      key: "last_login",
+      label: "Verified On",
+      sortable: true,
+      render: (value: string) =>
+        value ? new Date(value).toLocaleDateString() : "-",
+    },
     {
       key: "actions",
       label: "Actions",
@@ -83,7 +90,7 @@ export const AssetsDetails: React.FC = () => {
         <button
           type="button"
           className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-        
+          onClick={() => handleOpenModal(row)}
         >
           Update
         </button>
@@ -96,13 +103,13 @@ export const AssetsDetails: React.FC = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Assets Details
+          Address Verification
         </h1>
         <div className="flex items-center space-x-3">
           <div className="flex flex-1">
             <input
               type="text"
-              placeholder=""
+              placeholder="Search by name or email"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -118,17 +125,25 @@ export const AssetsDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* Table + Pagination */}
-
+      {/* Users Table */}
       <Table
         columns={columns}
-        data={assetsDetails}
+        data={users}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
         loading={loading}
         totalItems={totalItems}
       />
+
+      {/* ✅ Address Verification Modal */}
+      {isModalOpen && (
+        <UserVerifyAddressModel
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          selectedData={selectedUser}
+        />
+      )}
     </div>
   );
 };

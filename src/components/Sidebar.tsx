@@ -25,6 +25,7 @@ import { NavigationItem } from '../types';
 import { getUserDetails } from '../services/userService';
 import { showToast } from '../utils/toast';
 import { getSupportTicket } from '../services/SupportTicketService';
+import { getAddressVerificationDetails, getVerificationDetails, idVerificationDetails } from '../services/AdminVerificationDetails';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -52,6 +53,10 @@ export const iconMap = {
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
   const [users, setUsers] = useState<any>();
+    const [addressDetails, setAddressDetails] = useState<any>();
+        const [idAddressDetails, setIdAddressDetails] = useState<any>();
+
+
   const [tickets, setTickets] = useState<any>();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -80,14 +85,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
         { id: 'ActiveUsers', label: 'Active Users', icon: 'Users', path: '/ActiveUsers', badge: users?.active_users || 0 },
         { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers', badge: users?.total_users || 0 },
         { id: 'banned', label: 'banned Users', icon: 'Users', path: '/banned', badge: users?.banned_users || 0 },
-        { id: 'EmailUnverified', label: 'Email Unverified', icon: 'Users', path: '/email-unverified', badge: users?.total_email_unverifiedUsers || 0 },
-        { id: 'MobileUnverified', label: 'Mobile Unverified', icon: 'Users', path: '/mobile-unverified', badge: users?.total_number_unverifiedUsers || 0 },
-        { id: 'kycUnverified', label: 'Kyc Unverified', icon: 'Users', path: '/kyc-unverified', badge: users?.totalUnverifiedKycUsers || 0 },
-        { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
-        { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
-        { id: 'Id-Verification', label: 'Id-Verification', icon: 'Users', path: '/Id-Verification' },
+        // { id: 'EmailUnverified', label: 'Email Unverified', icon: 'Users', path: '/email-unverified', badge: users?.total_email_unverifiedUsers || 0 },
+        // { id: 'MobileUnverified', label: 'Mobile Unverified', icon: 'Users', path: '/mobile-unverified', badge: users?.total_number_unverifiedUsers || 0 },
+        // { id: 'kycUnverified', label: 'Kyc Unverified', icon: 'Users', path: '/kyc-unverified', badge: users?.totalUnverifiedKycUsers || 0 },
+        // { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
+        // { id: 'Id-Verification', label: 'Country-Vise-Verification', icon: 'Users', path: '/Id-Verification' },
+        // { id: 'address_verifications', label: 'address_verifications', icon: 'Users', path: '/address_verifications' },
+           { id: 'addresverificaiondetails', label: 'Address Verification Details', icon: 'Circle', path: '/address-verification-details' , badge: addressDetails?.total_pending || 0 },
+        { id: 'idverificaiondetails', label: 'Id Verification Details', icon: 'Circle', path: '/id-verification-details', badge: idAddressDetails?.total_pending || 0 },
+            { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
+
+
       ],
     },
+
+    //     {
+    //   id: 'Verification',
+    //   label: 'Verification',
+    //   icon: 'ShieldCheck',
+    //   children: [
+    //     { id: 'addresverificaiondetails', label: 'Address Verification Details', icon: 'Circle', path: '/address-verification-details' },
+    //     { id: 'idverificaiondetails', label: 'Id Verification Details', icon: 'Circle', path: '/id-verification-details' },
+    //   ],
+    // },
+
 
     {
       id: 'Support Ticket',
@@ -104,15 +125,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
     { id: 'assetsDetail', label: 'assetDetail', icon: 'Wallet', path: '/assets-details' },
     { id: 'admin', label: 'admin', icon: 'User', path: '/admin' },
     { id: 'Advertisements', label: 'offer', icon: 'LayoutDashboard', path: '/advertisements' },
-    {
-      id: 'admin Verification',
-      label: 'Admin Verification',
-      icon: 'ShieldCheck',
-      children: [
-        { id: 'addresverificaiondetails', label: 'Address Verification Details', icon: 'Circle', path: '/address-verification-details' },
-        { id: 'idverificaiondetails', label: 'Id Verification Details', icon: 'Circle', path: '/id-verification-details' },
-      ],
-    },
 
     { id: 'walletsDetails', label: 'Wallets Details', icon: 'Wallet', path: '/wallet-details' },
 
@@ -137,6 +149,39 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
 
 
   ];
+
+
+   const fetchAddressVerificationDetails = async (status: string = "", page: number = 1) => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No auth token found");
+          const data = await getAddressVerificationDetails(token);
+        setAddressDetails(data?.analytics || []);
+      
+      } catch (err: any) {
+        showToast("error", err.message);
+      } 
+    };
+  
+    useEffect(() => {
+      fetchAddressVerificationDetails();
+    }, []);
+
+       const fetchIdAddressVerificationDetails = async (status: string = "", page: number = 1) => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No auth token found");
+          const data = await getVerificationDetails(token );
+        setIdAddressDetails(data?.analytics || []);
+      
+      } catch (err: any) {
+        showToast("error", err.message);
+      } 
+    };
+  
+    useEffect(() => {
+      fetchIdAddressVerificationDetails();
+    }, []);
 
   const fetchData = async (query: string = "", page: number = 1) => {
     try {
@@ -195,7 +240,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
   console.log("users", users)
   return (
     <div className={`${isCollapsed ? 'w-16' : 'w-64'
-      } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-screen `}>
+      } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-fixed `}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 ">
         <div className="flex items-center justify-between">

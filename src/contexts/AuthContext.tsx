@@ -47,10 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data } = await api.get("/profile/admin-details", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (data?.data) {
-        const decrypted = await decryptData(data?.data, token);
-        setAdmin(decrypted?.data || {});
-      }
+              setAdmin(data?.data || {});
+
+      // if (data?.data) {
+      //   const decrypted = await decryptData(data?.data, token);
+      //   setAdmin(decrypted?.data || {});
+      // }
 
       setUser(data);
     }

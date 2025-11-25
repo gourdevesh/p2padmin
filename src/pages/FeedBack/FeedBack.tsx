@@ -21,7 +21,7 @@ export const FeedBack: React.FC = () => {
 
             const res = await getFeedBack(token) || "";
 
-            setData(res.data);
+            setData(res.feedbackData);
 
         } catch (error: any) {
             const apiError = error.response?.data;
@@ -44,53 +44,74 @@ export const FeedBack: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, []);
-    console.log("data", data)
-    const columns = [
-        { key: "depositStatus", label: "depositStatus", sortable: true },
-        { key: "maxWithdraw", label: "maxWithdraw", sortable: true },
-        {
-            key: "user_registration",
-            label: "user_registration",
-            sortable: true,
-        },
-        {
-            key: "withdrawType",
-            label: "withdrawType",
-            sortable: true,
-        },
+    console.log("dataas", data)
+   const columns = [
+  {
+    key: "review",
+    label: "Review",
+    sortable: false,
+    render: (_value: any, row: any) => row.feedback?.review || "-",
+  },
 
-        {
-            key: "trade_fee_type",
-            label: "trade_fee_type",
-            sortable: true,
-        },
-        {
-            key: "withdrawStatus",
-            label: "withdrawStatus",
-            sortable: true,
-        },
-        {
-            key: "trade_fee",
-            label: "trade_fee",
-            sortable: false,
-        },
+  {
+    key: "like",
+    label: "Like",
+    sortable: true,
+    render: (_value: any, row: any) =>
+      row.feedback?.like ? "👍 Yes" : "👎 No",
+  },
 
-        // {
-        //   key: "action",
-        //   label: "Action",
-        //   sortable: false,
-        //   render: (_value: any, row: TableRow) => (
-        //     <button
-        //       type="button"
-        //       className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-        //       onClick={() => navigate("/update-setting", { state: { rowData: row } })}
-        //     >
-        //       Update
-        //     </button>
-        //   ),
-        // },
+  {
+    key: "dislike",
+    label: "Dislike",
+    sortable: true,
+    render: (_value: any, row: any) =>
+      row.feedback?.dislike ? "👎 Yes" : "—",
+  },
 
-    ];
+  {
+    key: "userDetails",
+    label: "User Name",
+    sortable: true,
+    render: (_value: any, row: any) => row.userDetails?.name || "—",
+  },
+
+  {
+    key: "username",
+    label: "User Username",
+    sortable: true,
+    render: (_value: any, row: any) => row.userDetails?.username || "—",
+  },
+
+  {
+    key: "feedbackFrom",
+    label: "Feedback From",
+    sortable: true,
+    render: (_value: any, row: any) =>
+      row.feedbackFrom?.username || "—",
+  },
+
+  {
+    key: "tradeDetails",
+    label: "Trade ID",
+    sortable: true,
+    render: (_value: any, row: any) =>
+      row.tradeDetails?.trade_id || "—",
+  },
+
+  // ACTION BUTTON (optional)
+  // {
+  //   key: "action",
+  //   label: "Action",
+  //   sortable: false,
+  //   render: (_value, row) => (
+  //     <button className="px-3 py-1 bg-primary-500 text-white rounded-md">
+  //       View
+  //     </button>
+  //   ),
+  // },
+];
+
 
 
     return (

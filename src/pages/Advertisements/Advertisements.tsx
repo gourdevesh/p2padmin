@@ -36,11 +36,12 @@ export const Advertisements
                     }`;
 
                 const data = await getAdvertisements(token, finalQuery);
+                    setUsers(data?.data || {});
 
-                if (data?.data) {
-                    const decrypted = await decryptData(data?.data, token);
-                    setUsers(decrypted?.data || {});
-                }
+                // if (data?.data) {
+                //     const decrypted = await decryptData(data?.data, token);
+                //     setUsers(decrypted?.data || {});
+                // }
 
                 setCurrentPage(data?.pagination?.current_page || 1);
                 setTotalPages(data?.pagination?.last_page || 1);

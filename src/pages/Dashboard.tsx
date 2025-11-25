@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Users, TrendingUp, DollarSign, AlertTriangle, Activity, ArrowUpRight } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { showToast } from '../utils/toast';
+import { getDashboardDetails } from '../services/dashboardService';
+
 
 const monthlyData = [
   { name: 'Jan', trades: 120, revenue: 4500 },
@@ -26,7 +29,31 @@ const recentActivity = [
   { id: 5, user: 'Alex Brown', action: 'New registration', amount: '-', time: '15 minutes ago' },
 ];
 
+
 export const Dashboard: React.FC = () => {
+    const [loading , setLoading] = useState(false);
+    const [dashboard, setDashboard] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem("authToken");
+            if (!token) throw new Error("No auth token found");
+
+            const data = await getDashboardDetails(token);
+            setDashboard(data || []);
+        } catch (err: any) {
+            showToast("error", err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    console.log("dasboard",dashboard)
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -46,41 +73,41 @@ export const Dashboard: React.FC = () => {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
-          title="Total Users"
-          value="12,456"
-          change="+12% from last month"
+          title="Total Ads"
+          value={dashboard?.analytics?.MarketPerformance_metrics?.total_advertisements}
+          // change="+12% from last month"
           changeType="positive"
-          icon={Users}
+          icon={Activity}
           color="blue"
         />
         <StatCard
-          title="Active Trades"
-          value="1,234"
-          change="+8% from yesterday"
+          title="Total Trades"
+          value={dashboard?.analytics?.MarketPerformance_metrics?.total_trades}
+          // change="+8% from yesterday"
           changeType="positive"
           icon={Activity}
           color="green"
         />
         <StatCard
-          title="Completed Trades"
-          value="45,678"
-          change="+15% from last month"
+          title="Total Withdrawal"
+          value={dashboard?.analytics?.withdrawals?.total_withdrawal}
+          // change="+15% from last month"
           changeType="positive"
           icon={TrendingUp}
           color="purple"
         />
         <StatCard
-          title="Total Revenue"
-          value="$156,789"
-          change="+23% from last month"
+          title="Pending Withdrawal"
+          value={dashboard?.analytics?.withdrawals?.total_pending_withdrawal}
+          // change="+23% from last month"
           changeType="positive"
           icon={DollarSign}
           color="green"
         />
         <StatCard
-          title="Pending Disputes"
-          value="23"
-          change="-5% from yesterday"
+          title="Rejected Withdrawal"
+          value={dashboard?.analytics?.withdrawals?.total_rejected_withdrawal}
+          // change="-5% from yesterday"
           changeType="positive"
           icon={AlertTriangle}
           color="yellow"

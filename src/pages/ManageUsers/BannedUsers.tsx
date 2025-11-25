@@ -68,11 +68,14 @@ export const BannedUsers
                     </div>
                 ),
             },
+
             {
                 key: "email",
                 label: "Email",
                 sortable: true,
             },
+            { key: "user_status", label: "user status", sortable: true },
+
             {
                 key: "country",
                 label: "Country",
@@ -92,11 +95,11 @@ export const BannedUsers
                     <button
                         type="button"
                         className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-  onClick={() =>
-            navigate(`/user-detail/${row.user_id}`, {
-              state: { data: row },
-            })
-          }                    >
+                        onClick={() =>
+                            navigate(`/user-detail/${row.user_id}`, {
+                                state: { data: row },
+                            })
+                        }                    >
                         Details
                     </button>
                 ),

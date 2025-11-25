@@ -29,11 +29,13 @@ export const Admin: React.FC = () => {
         }${selectedRole ? `&role=${selectedRole}` : ""}`;
 
       const data = await getAdmin(token, finalQuery);
+              setAssetsDetails(data?.data || {});
 
-      if (data?.data) {
-        const decrypted = await decryptData(data?.data, token);
-        setAssetsDetails(decrypted?.data || {});
-      }
+
+      // if (data?.data) {
+      //   const decrypted = await decryptData(data?.data, token);
+      //   setAssetsDetails(decrypted?.data || {});
+      // }
 
       setCurrentPage(data?.pagination?.current_page || 1);
       setTotalPages(data?.pagination?.last_page || 1);

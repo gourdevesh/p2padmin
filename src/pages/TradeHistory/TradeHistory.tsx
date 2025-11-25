@@ -52,11 +52,12 @@ const TradeHistory: React.FC = () => {
 
             const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
             const data = await getTradeHistory(token, finalQuery);
+                                 setTradeData(data?.data || []);
 
-            if (data?.data) {
-                const decrypted = await decryptData(data.data, token);
-                setTradeData(decrypted?.data || []);
-            }
+            // if (data?.data) {
+            //     const decrypted = await decryptData(data.data, token);
+            //     setTradeData(decrypted?.data || []);
+            // }
             setCurrentPage(data?.pagination?.current_page || 1);
             setTotalPages(data?.pagination?.last_page || 1);
         } catch (err: any) {

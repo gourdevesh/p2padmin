@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { Table } from "../../components/Table";
 import { showToast } from "../../utils/toast";
 import { getSupportTicket } from "../../services/SupportTicketService";
+import { useNavigate } from "react-router-dom";
 
 export const CloseTickets
     : React.FC = () => {
@@ -12,6 +13,7 @@ export const CloseTickets
         const [loading, setLoading] = useState(true);
         const [totalPages, setTotalPages] = useState(1);
         const [totalItems, setTotalItems] = useState(0);
+        const navigate = useNavigate()
         const fetchData = async (query: string = "", page: number = 1) => {
             try {
                 setLoading(true);
@@ -19,7 +21,7 @@ export const CloseTickets
                 if (!token) throw new Error("No auth token found");
 
                 // ✅ Page query ke andar hi bhejna
-                const finalQuery = `status=close&page=${page}${query ? `&ticket_number=${query}` : ""
+                const finalQuery = `status=closed&page=${page}${query ? `&ticket_number=${query}` : ""
                     }`;
 
                 const data = await getSupportTicket(token, finalQuery);
@@ -125,8 +127,11 @@ export const CloseTickets
                     <button
                         type="button"
                         className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-                        onClick={() => console.log("Details of:", row)}
-                    >
+  onClick={() =>
+                            navigate(`/reply-ticket/${row.ticket_id}`, {
+                                state: { ticket_number: row.ticket_number },
+                            })
+                        }                    >
                         Details
                     </button>
                 ),
@@ -138,7 +143,7 @@ export const CloseTickets
                 {/* Page Header */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        Pending Tickets
+                        closed Tickets
                     </h1>
                     <div className="flex items-center space-x-3">
                         <div className="flex flex-1">
