@@ -29,7 +29,7 @@ export const Admin: React.FC = () => {
         }${selectedRole ? `&role=${selectedRole}` : ""}`;
 
       const data = await getAdmin(token, finalQuery);
-              setAssetsDetails(data?.data || {});
+      setAssetsDetails(data?.data || {});
 
 
       // if (data?.data) {
@@ -67,8 +67,49 @@ export const Admin: React.FC = () => {
       ),
     },
     { key: "role", label: "role", sortable: true },
+{
+  key: "permissions",
+  label: "Permissions",
+  render: (value: any, row: any) => {
+    // Case 1: null / undefined / empty → show "—"
+    if (!row.permissions || row.permissions.length === 0) {
+      return <span className="text-sm text-gray-700">—</span>;
+    }
+
+    // Case 2: show first 2 permissions only
+    const perms = Array.isArray(row.permissions) ? row.permissions : [];
+
+    const displayPerms = perms.slice(0, 2).join(", ");
+    const extraCount = perms.length > 2 ? ` +${perms.length - 2} more` : "";
+
+    return (
+      <span className="text-sm text-gray-700 whitespace-nowrap">
+        {displayPerms}
+        {extraCount}
+      </span>
+    );
+  },
+},
+
+
     { key: "email", label: "email", sortable: true },
     { key: "admin_status", label: "admin_status", sortable: true },
+{
+  key: "actions",
+  label: "Actions",
+  render: (value: any, row: any) => (
+    <button
+      onClick={() =>
+        navigate("/update-admin", {
+          state: { rowData: row },
+        })
+      }
+      className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+    >
+      Update
+    </button>
+  ),
+},
   ];
 
   return (
@@ -92,7 +133,7 @@ export const Admin: React.FC = () => {
               className="p-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={role}
               onChange={(e) => {
-                setCurrentPage(1); 
+                setCurrentPage(1);
                 setRole(e.target.value);
               }}
             >

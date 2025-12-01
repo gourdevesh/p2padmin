@@ -62,7 +62,7 @@ const TransactionsDetails: React.FC = () => {
 
             const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
             const data = await getTransactionDetails(token, finalQuery);
-                setTradeData(data?.data || []);
+            setTradeData(data?.data || []);
 
             // if (data?.data) {
             //     const decrypted = await decryptData(data.data, token);
@@ -156,7 +156,7 @@ const TransactionsDetails: React.FC = () => {
                         {`${value.slice(0, 6)}...${value.slice(-5)}`}
                         <span
                             className="ml-2 cursor-pointer"
-                            onClick={() => handleCopy(value, value)} 
+                            onClick={() => handleCopy(value, value)}
                         >
                             {isCopied ? (
                                 <Check className="text-green-500" size={18} />

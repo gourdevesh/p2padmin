@@ -3,7 +3,7 @@ import { Edit, Repeat, Slash } from "lucide-react";
 import { useCryptoOption } from "../Store/cryptoOption";
 
 export default function AllDetailUser() {
-    const cryptoOption = useCryptoOption();
+    const cryptoOption = useCryptoOption(113);
 
     const [user, setUser] = useState({
         id: "u_001",

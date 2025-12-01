@@ -26,6 +26,7 @@ import { getUserDetails } from '../services/userService';
 import { showToast } from '../utils/toast';
 import { getSupportTicket } from '../services/SupportTicketService';
 import { getAddressVerificationDetails, getVerificationDetails, idVerificationDetails } from '../services/AdminVerificationDetails';
+import { useAuth } from '../hooks/useAuth';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -53,9 +54,11 @@ export const iconMap = {
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
   const [users, setUsers] = useState<any>();
-    const [addressDetails, setAddressDetails] = useState<any>();
-        const [idAddressDetails, setIdAddressDetails] = useState<any>();
+  const [addressDetails, setAddressDetails] = useState<any>();
+  const [idAddressDetails, setIdAddressDetails] = useState<any>();
 
+
+  const { admin } = useAuth();
 
   const [tickets, setTickets] = useState<any>();
   const navigate = useNavigate();
@@ -71,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       id: 'managePayment',
       label: 'Manage Payment',
       icon: 'CreditCard',
+      permission: "payment",
       children: [
         { id: 'getPaymentDetails', label: 'Payment Details', icon: 'Circle', path: '/get-payment-details' },
         { id: 'getUpiDetails', label: 'UPI Details', icon: 'Circle', path: '/upi-details' },
@@ -81,6 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       id: 'Manage Users',
       label: 'Manage Users',
       icon: 'Users',
+      permission: "users",
       children: [
         { id: 'ActiveUsers', label: 'Active Users', icon: 'Users', path: '/ActiveUsers', badge: users?.active_users || 0 },
         { id: 'AllUser', label: 'All Users', icon: 'Users', path: '/AllUsers', badge: users?.total_users || 0 },
@@ -91,9 +96,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
         // { id: 'KYCPending', label: 'KYC Pending', icon: 'Users', path: '/kyc-pending', badge: users?.totalPendingKyc || 0 },
         // { id: 'Id-Verification', label: 'Country-Vise-Verification', icon: 'Users', path: '/Id-Verification' },
         // { id: 'address_verifications', label: 'address_verifications', icon: 'Users', path: '/address_verifications' },
-           { id: 'addresverificaiondetails', label: 'Address Verification Details', icon: 'Circle', path: '/address-verification-details' , badge: addressDetails?.total_pending || 0 },
+        { id: 'addresverificaiondetails', label: 'Address Verification Details', icon: 'Circle', path: '/address-verification-details', badge: addressDetails?.total_pending || 0 },
         { id: 'idverificaiondetails', label: 'Id Verification Details', icon: 'Circle', path: '/id-verification-details', badge: idAddressDetails?.total_pending || 0 },
-            { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
+        { id: 'UserTradeLimit', label: 'User Trade Limit', icon: 'Users', path: '/trade-limit' },
 
 
       ],
@@ -114,6 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       id: 'Support Ticket',
       label: 'Support Ticket',
       icon: 'Ticket',
+  permission: "support",
       children: [
         { id: 'PendingTickets', label: 'Pending Tickets', icon: 'Users', path: '/pending-tickets', badge: tickets?.total_pending_tickets || 0 },
         { id: 'ClosedTickets', label: 'Closed Tickets', icon: 'Users', path: '/closed-tickets', badge: tickets?.total_closed_tickets || 0 },
@@ -123,22 +129,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       ],
     },
     { id: 'assetsDetail', label: 'assetDetail', icon: 'Wallet', path: '/assets-details' },
-    { id: 'admin', label: 'admin', icon: 'User', path: '/admin' },
+    { id: 'admin', label: 'admin', icon: 'User', permission: 'admin', path: '/admin' },
     { id: 'Advertisements', label: 'offer', icon: 'LayoutDashboard', path: '/advertisements' },
 
-    { id: 'walletsDetails', label: 'Wallets Details', icon: 'Wallet', path: '/wallet-details' },
+    { id: 'walletsDetails', label: 'Wallets Details', icon: 'Wallet', permission: "wallets", path: '/wallet-details' },
 
     // { id: 'users', label: 'Users', icon: 'Users', path: '/users' },
-    { id: 'tradeHistory', label: 'Trade History', icon: 'Users', path: '/trade-history' },
-    { id: 'feedback', label: 'feed Back', icon: 'MessageCircle', path: '/feedback' },
+    { id: 'tradeHistory', label: 'Trade History', icon: 'Users', permission: 'trade', path: '/trade-history' },
+    { id: 'feedback', label: 'feed Back', icon: 'MessageCircle', permission: 'feedback', path: '/feedback' },
 
-    { id: 'transactions', label: 'Transactions', icon: 'ArrowRightLeft', path: '/transactions-details' },
-    { id: 'wallets', label: 'Wallets', icon: 'Wallet', path: '/wallet' },
-    { id: 'disputes', label: 'Disputes', icon: 'MessageSquare', path: '/disputes' },
+    { id: 'transactions', label: 'Transactions', icon: 'ArrowRightLeft', permission: 'transactions', path: '/transactions-details' },
+    { id: 'wallets', label: 'Wallets', icon: 'Wallet', permission: 'wallets', path: '/wallet' },
+    { id: 'disputes', label: 'Disputes', icon: 'MessageSquare',      permission: "support", path: '/disputes' },
     {
       id: 'settings',
       label: 'settings',
       icon: 'Settings',
+      permission: 'settings',
       children: [
         { id: 'settings', label: 'Settings', icon: 'Settings', path: '/setting' },
         { id: 'systemsetting', label: 'System Setting', icon: 'Circle', path: '/system-setting' },
@@ -151,37 +158,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
   ];
 
 
-   const fetchAddressVerificationDetails = async (status: string = "", page: number = 1) => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("No auth token found");
-          const data = await getAddressVerificationDetails(token);
-        setAddressDetails(data?.analytics || []);
-      
-      } catch (err: any) {
-        showToast("error", err.message);
-      } 
-    };
-  
-    useEffect(() => {
-      fetchAddressVerificationDetails();
-    }, []);
+  const fetchAddressVerificationDetails = async (status: string = "", page: number = 1) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
+      const data = await getAddressVerificationDetails(token);
+      setAddressDetails(data?.analytics || []);
 
-       const fetchIdAddressVerificationDetails = async (status: string = "", page: number = 1) => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("No auth token found");
-          const data = await getVerificationDetails(token );
-        setIdAddressDetails(data?.analytics || []);
-      
-      } catch (err: any) {
-        showToast("error", err.message);
-      } 
-    };
-  
-    useEffect(() => {
-      fetchIdAddressVerificationDetails();
-    }, []);
+    } catch (err: any) {
+      showToast("error", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddressVerificationDetails();
+  }, []);
+
+  const fetchIdAddressVerificationDetails = async (status: string = "", page: number = 1) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
+      const data = await getVerificationDetails(token);
+      setIdAddressDetails(data?.analytics || []);
+
+    } catch (err: any) {
+      showToast("error", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchIdAddressVerificationDetails();
+  }, []);
 
   const fetchData = async (query: string = "", page: number = 1) => {
     try {
@@ -235,6 +242,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
     setExpanded(expanded === id ? null : id);
   };
 
+  // Identify super admin exactly by role
+  const isSuperAdmin = admin?.role === "super_admin";
+  const isAdmin = admin?.role === "admin";
+
+  const allowedMenus = navigationItems.filter(item => {
+
+    // Super Admin → always allow all menus
+    if (isSuperAdmin) return true;
+    if (isAdmin) return true;
+
+
+    // Menu without permission → allow for normal admins also
+    if (!item.permission) return true;
+
+    // Normal admin → allow only if permission exists
+    return admin?.permissions?.includes(item.permission);
+  });
 
 
   console.log("users", users)
@@ -242,8 +266,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
     <div className={`${isCollapsed ? 'w-16' : 'w-64'
       } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-fixed `}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 ">
-        <div className="flex items-center justify-between">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700  ">
+        <div className="flex items-center justify-between ">
           {!isCollapsed && (
             <h1 className="text-xl font-bold text-gray-800 dark:text-white">
               P2P Admin
@@ -261,7 +285,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
       {/* Navigation */}
       <nav className="flex-1 p-4 dark:bg-gray-800 ">
         <ul>
-          {navigationItems.map((item) => {
+          {allowedMenus.map((item) => {
             const Icon = iconMap[item.icon];
             const isActive = location.pathname === item.path;
             const isExpanded = expanded === item.id;

@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("authToken", data.token);
       fetchAdminDetails(data.token);
     }
+    
+
 
     return data;
   };

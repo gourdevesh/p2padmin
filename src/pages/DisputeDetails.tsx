@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, ArrowLeft } from "lucide-react";
 import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { Dialog } from "@headlessui/react";
 import { db } from "./Config/firebaseConfig";
@@ -12,6 +12,8 @@ import CancelTradeModal from "../Models/CandelTradeModel";
 import NewTradeModal from "../Models/NewTradeModal";
 import { cancelTrade } from "../services/TradeHistory";
 import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCryptoOptions } from "./Store/cryptoOption2";
 
 interface Media {
   url: string;
@@ -49,19 +51,32 @@ interface Dispute {
 
 export const DisputeDetail: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const tradeId = "tradeId:458";
+  const location = useLocation();
 
-  const dispute: Dispute = {
-    reporter: "Mukesh Rai",
-    reported: "Devashish Rajbhar",
-    tradeId: "445",
-    crypto: "BTC",
-    amount: 0.25,
-    price: 25000,
-    status: "pending",
-    result: "reporter" // or "reported"
+  const row = location.state?.row;
+  console.log("rowdeatils", row)
+  const tradeId = `tradeId: ${row?.trade_details?.trade_id}`;
 
+  const dispute = {
+    // Reporter → ticket बनाने वाला
+    reporter: row?.reporter_details?.name || "Unknown",
+
+    // Reported → buyer या seller में से दूसरा user
+    reported: row?.reported_details?.username,
+    // Trade details
+    tradeId: row?.trade_details?.trade_id || "N/A",
+    crypto: row?.trade_details?.asset || "N/A",
+
+    // Trade amount values (your schema → amount = crypto, buy_value = fiat)
+    amount: row?.trade_details?.amount || 0,
+    price: row?.trade_details?.buy_value || 0,
+
+    // Ticket/Trade Status
+    status: row?.status || "pending",
+    result: row?.trade_details?.trade_status || "pending"
   };
+
+
 
   useEffect(() => {
     if (!tradeId) return;
@@ -93,6 +108,7 @@ export const DisputeDetail: React.FC = () => {
   const [openResultModal, setOpenResultModal] = useState(false);
   const [result, setResult] = useState("buyer");
   const [openCancelModal, setOpenCancelModal] = React.useState(false);
+  const navigate = useNavigate()
   const [tradeInfo, setTradeInfo] = useState<{
     amount: string;
     assetValue: string;
@@ -140,16 +156,15 @@ export const DisputeDetail: React.FC = () => {
     // 🔹 TODO: API call to save result
     setOpenResultModal(false);
   };
-  const [holdings, setHoldings] = useState([
-    { id: "h_btc", name: "Bitcoin", symbol: "BTC", qty: 0.15, currentPrice: 4333333 },
-    { id: "h_eth", name: "Ethereum", symbol: "ETH", qty: 1.2, currentPrice: 183333 },
-    { id: "h_usdt", name: "Tether", symbol: "USDT", qty: 5000, currentPrice: 83 },
-  ]);
 
   // ---------------- Component Render ----------------
 
 
-  const cryptoOption = useCryptoOption();
+  const cryptoOption = useCryptoOption(row?.reported_details?.user_id);
+  const cryptoOptions = useCryptoOptions();
+
+
+  console.log("cryptoOption", cryptoOption)
   const [tradeData, setTradeData] = useState<any>(null);
 
   const fetchData = async (query: string = "", page: number = 1) => {
@@ -198,374 +213,432 @@ export const DisputeDetail: React.FC = () => {
 
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
-      {/* Users */}
-    <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-xl">
-  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+    <>
+      <div className="flex flex-row items-center justify-between  flex-wrap mb-3">
+        {/* Left side */}
+        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Dispute Details
+        </h1>
 
-    {/* LEFT SECTION — Reporter & Reported */}
-    <div className="flex flex-col lg:flex-row gap-8 w-full">
-
-      {/* Reporter */}
-      <div className="flex items-center gap-3 min-w-0">
-        <User size={26} className="text-white" />
-
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-white/70">Reporter</p>
-
-            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-              Buyer
-            </span>
-
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
-              onClick={() => setOpenPredefinedModal(true)}
-            >
-              Message
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center mt-1 gap-2">
-            <p className="text-lg font-semibold text-white truncate max-w-[130px]">
-              {dispute.reporter}
-            </p>
-
-            <span className="text-xs text-white">Total: ₹{dispute.price}</span>
-
-            {dispute.result === "reporter" && (
-              <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">
-                Win
-              </span>
-            )}
-            {dispute.result === "reported" && (
-              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
-                Lose
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Reported */}
-      <div className="flex items-center gap-3 min-w-0">
-        <User size={26} className="text-white" />
-
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-white/70">Reported</p>
-
-            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-              Seller
-            </span>
-
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
-              onClick={() => setOpenPredefinedModal(true)}
-            >
-              Message
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center mt-1 gap-2">
-            <p className="text-lg font-semibold text-white truncate max-w-[130px]">
-              {dispute.reported}
-            </p>
-
-            <span className="text-xs text-white">Total: ₹{dispute.price}</span>
-
-            {dispute.result === "reported" && (
-              <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">
-                Win
-              </span>
-            )}
-            {dispute.result === "reporter" && (
-              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
-                Lose
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* RIGHT SECTION — Trade Info & Buttons */}
-    <div className="flex flex-col lg:flex-row gap-4 lg:items-center w-full lg:w-auto">
-
-      {/* Trade ID */}
-      <div className="flex items-center gap-2">
-        <CreditCard size={26} className="text-white/80" />
-        <div>
-          <p className="text-sm text-white/70">Trade_ID</p>
-          <p className="text-lg font-semibold text-white">{dispute.tradeId}</p>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3">
+        {/* Right side */}
         <button
-          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-          onClick={() => setOpenReleaseModal(true)}
+          onClick={() => navigate(-1)}
+          className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+                                     text-gray-800 dark:text-gray-200 font-medium 
+                                     rounded-md shadow-sm border border-gray-300 dark:border-gray-600
+                                     hover:bg-gray-200 dark:hover:bg-gray-600 
+                                     transition-colors duration-200 focus:outline-none focus:ring-2 
+                                     focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
         >
-          Release Crypto
-        </button>
-
-        <button
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-          onClick={handleCancelTrade}
-        >
-          Cancel Trade
-        </button>
-
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
-          onClick={() => setIsModalOpen(true)}
-        >
-          New Trade
+          <ArrowLeft className="mr-2 w-4 h-4" />
+          Back
         </button>
       </div>
-    </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-6">
+
+        {/* Users */}
+        <div className=" p-4 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+
+            {/* Reporter & Reported */}
+            <div className="flex flex-col md:flex-row gap-6 md:gap-10 w-full md:w-auto">
+
+              {/* Reporter */}
+              <div className="flex items-center gap-2 min-w-0">
+                <User size={24} className="text-white" />
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center">
+                    <p className="text-sm text-white/70">Reporter</p>
+
+                    <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                      {row?.reporter_details?.role === "seller" ? "Seller" : "Buyer"}
+                    </span>
+                    <button
+                      className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-lg"
+                      onClick={() => setOpenPredefinedModal(true)}
+                    >
+                      Message
+                    </button>
+                  </div>
+                  <div className="flex items-center mt-1">
+                    <p className="text-lg font-semibold text-white truncate">{dispute.reporter}</p>
+                    <p className="ml-3 text-xs text-white">
+                      Total: ₹{dispute.price}
+                    </p>
+
+                    {dispute.result === "reporter" && (
+                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                    )}
+                    {dispute.result === "reported" && (
+                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                    )}
+
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Reported */}
+              <div className="flex items-center gap-3 min-w-0">
+                <User size={24} className="text-white" />
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center ">
+                    <p className="text-sm text-white/70">Reported</p>
+
+
+                    <span className="ml-2 bg-gray-700/20 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                      {row?.reported_details?.role === "seller" ? "Seller" : "Buyer"}
+                    </span>
+                    <button
+                      className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
+                      onClick={() => setOpenPredefinedModal(true)}
+                    >
+                      Message
+                    </button>
+                  </div>
+                  <div className="flex items-center mt-1">
+                    <p className="text-lg font-semibold text-white truncate">{dispute.reported}</p>
+                    <p className="ml-3 text-xs text-white font-medium">
+                      Total: ₹{dispute.price}
+                    </p>
+
+                    {dispute.result === "reported" && (
+                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                    )}
+                    {dispute.result === "reporter" && (
+                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <ReleaseCryptoModal
+              isOpen={openReleaseModal}
+              onClose={() => setOpenReleaseModal(false)}
+              onConfirm={handleReleaseCrypto}
+              buyerName={dispute.reporter} // dynamically show buyer
+            />
+            <PredefinedMessageModal
+              isOpen={openPredefinedModal}
+              onClose={() => setOpenPredefinedModal(false)}
+              onSend={handleSendPredefinedMessage}
+            />
+
+            {/* Trade ID & Release Button */}
+            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
+              {/* Trade Info */}
+              <div className="flex items-center gap-2">
+                <CreditCard size={24} className="text-white/80" />
+                <div>
+                  <p className="text-sm text-white/70">Trade_ID</p>
+                  <p className="text-lg font-semibold text-white truncate">
+                    {dispute.tradeId}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 flex flex-wrap gap-2">
+                <button
+                  className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                  onClick={() => setOpenReleaseModal(true)}
+                >
+                  Release Crypto
+                </button>
+
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                  onClick={handleCancelTrade}
+                >
+                  Cancel Trade
+                </button>
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  New Trade
+                </button>
+              </div>
+            </div>
+            <NewTradeModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onTrade={handleTrade}
+            />
+            <CancelTradeModal
+              isOpen={openCancelModal}
+              onClose={() => setOpenCancelModal(false)}
+              onConfirm={async () => {
+                if (!window.confirm("⚠️ Are you sure you want to cancel this trade?")) return;
+
+                try {
+                  const tradeDto = { trade_id: 456 };
+                  const token = localStorage.getItem("authToken");
+
+                  // const response = await cancelTrade(tradeDto, token || "");
+                  toast.info("⏳ Cancelling trade...");
+                  await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
+
+                  setTradeInfo(null);
+                  setOpenCancelModal(false);
+                } catch (err: any) {
+                  alert(`❌ ${err.message}`);
+                }
+              }}
+            />
+
+          </div>
+        </div>
+
+        {tradeInfo && (
+          <div className="mt-8 max-full  dark:bg-gray-700 
+                                     text-gray-800 dark:text-gray-200 bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all hover:shadow-xl">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+              📊 Trade Summary
+            </h3>
+
+            <div className="space-y-2 text-gray-700">
+              <p className="flex justify-between">
+                <span className="font-medium">💰 Amount (INR):</span>
+                <span className="font-semibold text-gray-900">
+                  ₹{tradeInfo.amount}
+                </span>
+              </p>
+
+              <p className="flex justify-between">
+                <span className="font-medium">🪙 Cryptocurrency:</span>
+                <span className="font-semibold text-gray-900 uppercase">
+                  {tradeInfo.cryptocurrency}
+                </span>
+              </p>
+
+              <p className="flex justify-between">
+                <span className="font-medium">📦 Asset Value:</span>
+                <span className="font-semibold text-green-600">
+                  {tradeInfo.assetValue}
+                </span>
+              </p>
+            </div>
+
+            <div className="mt-5 text-sm text-gray-500 border-t pt-3">
+              Trade started successfully. View status in your dashboard 🚀
+            </div>
+          </div>
+        )}
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+  {/* ✅ First Crypto Holdings Card */}
+  <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
+    <h2 className="font-semibold text-lg mb-3">
+      Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
+{row?.reporter_details?.name}</span>
+    </h2>
+    <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
+      <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+        <tr>
+          <th className="p-2 text-left">Coin</th>
+          <th className="p-2 text-left">Symbol</th>
+          <th className="p-2 text-left">Quantity</th>
+          <th className="p-2 text-left">Price</th>
+          <th className="p-2 text-left">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {cryptoOptions.map((h, index) => (
+          <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td className="p-2">{h.shrotName}</td>
+            <td className="p-2">{h.name}</td>
+            <td className="p-2">{h.blc.toFixed(8)}</td>
+            <td className="p-2">₹ {h.pricePerCoin.toLocaleString("en-IN")}</td>
+            <td className="p-2">
+              ₹ {(h.currentPrice * h.blc).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {/* ✅ Second Crypto Holdings Card */}
+  <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
+    <h2 className="font-semibold text-lg mb-3">
+      Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
+{row?.reported_details?.username}</span>
+    </h2>
+    <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
+      <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+        <tr>
+          <th className="p-2 text-left">Coin</th>
+          <th className="p-2 text-left">Symbol</th>
+          <th className="p-2 text-left">Quantity</th>
+          <th className="p-2 text-left">Price</th>
+          <th className="p-2 text-left">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {cryptoOption.map((h, index) => (
+          <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td className="p-2">{h.shrotName}</td>
+            <td className="p-2">{h.shrotName}</td>
+            <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
+            <td className="p-2">₹ {h.pricePerCoin}</td>
+            <td className="p-2">₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </div>
 </div>
 
-      {tradeInfo && (
-        <div className="mt-8 max-full bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all hover:shadow-xl">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-            📊 Trade Summary
-          </h3>
 
-          <div className="space-y-2 text-gray-700">
-            <p className="flex justify-between">
-              <span className="font-medium">💰 Amount (INR):</span>
-              <span className="font-semibold text-gray-900">
-                ₹{tradeInfo.amount}
-              </span>
-            </p>
 
-            <p className="flex justify-between">
-              <span className="font-medium">🪙 Cryptocurrency:</span>
-              <span className="font-semibold text-gray-900 uppercase">
-                {tradeInfo.cryptocurrency}
-              </span>
-            </p>
 
-            <p className="flex justify-between">
-              <span className="font-medium">📦 Asset Value:</span>
-              <span className="font-semibold text-green-600">
-                {tradeInfo.assetValue}
-              </span>
-            </p>
+
+        {/* Trade/Crypto Details */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm text-gray-700 p-4 rounded-xl bg-gradient-to-r from-teal-100 to-cyan-200 mt-4">
+          <div>
+            <p className="font-medium">Crypto</p>
+            <p>{dispute.crypto}</p>
           </div>
-
-          <div className="mt-5 text-sm text-gray-500 border-t pt-3">
-            Trade started successfully. View status in your dashboard 🚀
+          <div>
+            <p className="font-medium">Amount</p>
+            <p>{dispute.amount} BTC</p>
+          </div>
+          <div>
+            <p className="font-medium">Price</p>
+            <p>${dispute.price}</p>
+          </div>
+          <div>
+            <p className="font-medium">Status</p>
+            <p className="capitalize">{dispute.status}</p>
           </div>
         </div>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* ✅ First Crypto Holdings Card */}
-        <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto">
-          <h2 className="font-semibold text-lg mb-3">
-            Crypto Holdings — <span className="text-indigo-600">Mukesh</span>
-          </h2>    <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2 text-left">Coin</th>
-                <th className="p-2 text-left">Symbol</th>
-                <th className="p-2 text-left">Quantity</th>
-                <th className="p-2 text-left">Price</th>
-                <th className="p-2 text-left">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cryptoOption.map((h, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50">
-                  <td className="p-2">{h.shrotName}</td>
-                  <td className="p-2">{h.shrotName}</td>
-                  <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
-                  <td className="p-2">₹ {h.pricePerCoin}</td>
-                  <td className="p-2">
-                    ₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
 
-        {/* ✅ Second Crypto Holdings Card */}
-        <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto">
-          <h2 className="font-semibold text-lg mb-3">
-            Crypto Holdings — <span className="text-indigo-600">Devashish Rajbhar</span>
-          </h2>    <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2 text-left">Coin</th>
-                <th className="p-2 text-left">Symbol</th>
-                <th className="p-2 text-left">Quantity</th>
-                <th className="p-2 text-left">Price</th>
-                <th className="p-2 text-left">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cryptoOption.map((h, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50">
-                  <td className="p-2">{h.shrotName}</td>
-                  <td className="p-2">{h.shrotName}</td>
-                  <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
-                  <td className="p-2">₹ {h.pricePerCoin}</td>
-                  <td className="p-2">
-                    ₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {/* Messages */}
+        <div className="space-y-3">
+          <p className="font-medium text-gray-700 dark:text-gray-300">Messages</p>
+          <div className="space-y-2 max-h-80 overflow-y-auto flex flex-col">
+            {messages.map((msg) => {
+              const isCurrentUser = msg?.user?.role === "buyer"; // adjust later
 
-
-
-
-      {/* Trade/Crypto Details */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm text-gray-700 p-4 rounded-xl bg-gradient-to-r from-teal-100 to-cyan-200 mt-4">
-        <div>
-          <p className="font-medium">Crypto</p>
-          <p>{dispute.crypto}</p>
-        </div>
-        <div>
-          <p className="font-medium">Amount</p>
-          <p>{dispute.amount} BTC</p>
-        </div>
-        <div>
-          <p className="font-medium">Price</p>
-          <p>${dispute.price}</p>
-        </div>
-        <div>
-          <p className="font-medium">Status</p>
-          <p className="capitalize">{dispute.status}</p>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="space-y-3">
-        <p className="font-medium text-gray-700 dark:text-gray-300">Messages</p>
-        <div className="space-y-2 max-h-80 overflow-y-auto flex flex-col">
-          {messages.map((msg) => {
-            const isCurrentUser = msg?.user?.role === "buyer"; // adjust later
-
-            return (
-              <div
-                key={msg.id}
-                className={`p-3 rounded-lg text-sm max-w-[70%] ${isCurrentUser
-                  ? "bg-blue-50 text-blue-700 self-end"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 self-start"
-                  }`}
-              >
-                {/* User name */}
-                <div className="mb-1">
-                  <span className="font-medium">
-                    {msg.user?.firstName || "Unknown"}
-                  </span>
-                  <span className="text-xs text-gray-900 ml-2">
-                    {msg?.user?.role}
-                  </span>
-                </div>
-
-                {/* Text message */}
-                {msg.text && <p>{msg.text}</p>}
-
-                {/* Media files */}
-                {msg.medias?.map((media: Media, idx: number) => {
-                  if (media.type === "image") {
-                    const src = media.url.startsWith("data:")
-                      ? media.url
-                      : `data:image/png;base64,${media.url}`;
-                    return (
-                      <img
-                        key={idx}
-                        src={src}
-                        alt={media.name || "image"}
-                        className="mt-2 rounded max-w-full max-h-60"
-                      />
-                    );
-                  }
-                  return null;
-                })}
-
-                {/* Timestamp */}
-                {msg?.createdAt && (
-                  <div className="mt-1 text-right">
-                    <span className="text-xs text-gray-500">
-                      {new Date(msg.createdAt).toLocaleString([], {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+              return (
+                <div
+                  key={msg.id}
+                  className={`p-3 rounded-lg text-sm max-w-[70%] ${isCurrentUser
+                    ? "bg-blue-50 text-blue-700 self-end"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 self-start"
+                    }`}
+                >
+                  {/* User name */}
+                  <div className="mb-1">
+                    <span className="font-medium">
+                      {msg.user?.firstName || "Unknown"}
+                    </span>
+                    <span className="text-xs text-gray-900 ml-2">
+                      {msg?.user?.role}
                     </span>
                   </div>
-                )}
+
+                  {/* Text message */}
+                  {msg.text && <p>{msg.text}</p>}
+
+                  {/* Media files */}
+                  {msg.medias?.map((media: Media, idx: number) => {
+                    if (media.type === "image") {
+                      const src = media.url.startsWith("data:")
+                        ? media.url
+                        : `data:image/png;base64,${media.url}`;
+                      return (
+                        <img
+                          key={idx}
+                          src={src}
+                          alt={media.name || "image"}
+                          className="mt-2 rounded max-w-full max-h-60"
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {/* Timestamp */}
+                  {msg?.createdAt && (
+                    <div className="mt-1 text-right">
+                      <span className="text-xs text-gray-500">
+                        {new Date(msg.createdAt).toLocaleString([], {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+
+        <Dialog
+          open={openResultModal}
+          onClose={() => setOpenResultModal(false)}
+          className="relative z-50"
+        >
+          <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Dialog.Panel className="bg-white dark:bg-gray-800 p-6 rounded-xl max-w-sm w-full">
+              <Dialog.Title className="text-lg font-semibold text-gray-800 dark:text-white">
+                Mark Dispute Result
+              </Dialog.Title>
+
+              <div className="space-y-3 mt-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="result"
+                    value="buyer"
+                    onChange={() => setResult("buyer")}
+                    checked={result === "buyer"}
+                  />
+                  <span>Buyer Profited</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="result"
+                    value="seller"
+                    onChange={() => setResult("seller")}
+                    checked={result === "seller"}
+                  />
+                  <span>Seller Profited</span>
+                </label>
               </div>
-            );
-          })}
-        </div>
+
+              <div className="flex justify-end mt-6 space-x-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded-lg"
+                  onClick={() => setOpenResultModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg"
+                  onClick={handleSaveResult}
+                >
+                  Save
+                </button>
+              </div>
+            </Dialog.Panel>
+          </div>
+        </Dialog>
       </div>
-
-
-      <Dialog
-        open={openResultModal}
-        onClose={() => setOpenResultModal(false)}
-        className="relative z-50"
-      >
-        <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="bg-white dark:bg-gray-800 p-6 rounded-xl max-w-sm w-full">
-            <Dialog.Title className="text-lg font-semibold text-gray-800 dark:text-white">
-              Mark Dispute Result
-            </Dialog.Title>
-
-            <div className="space-y-3 mt-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="result"
-                  value="buyer"
-                  onChange={() => setResult("buyer")}
-                  checked={result === "buyer"}
-                />
-                <span>Buyer Profited</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="result"
-                  value="seller"
-                  onChange={() => setResult("seller")}
-                  checked={result === "seller"}
-                />
-                <span>Seller Profited</span>
-              </label>
-            </div>
-
-            <div className="flex justify-end mt-6 space-x-2">
-              <button
-                className="px-4 py-2 bg-gray-300 rounded-lg"
-                onClick={() => setOpenResultModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg"
-                onClick={handleSaveResult}
-              >
-                Save
-              </button>
-            </div>
-          </Dialog.Panel>
-        </div>
-      </Dialog>
-    </div>
+    </>
   );
 };

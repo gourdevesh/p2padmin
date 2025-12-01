@@ -20,18 +20,18 @@ export const AllUsers: React.FC = () => {
 
   console.log("users23", users)
 
-  const fetchData = async (query: string = "",  status: string = "", page: number = 1) => {
+  const fetchData = async (query: string = "", status: string = "", page: number = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
 
       // ✅ Page query ke andar hi bhejna
-   
-const finalQuery =
-  `page=${page}` +
-  `${query ? `&search=${query}` : ""}` +
-  `${status ? `&status=${status}` : ""}`;
+
+      const finalQuery =
+        `page=${page}` +
+        `${query ? `&search=${query}` : ""}` +
+        `${status ? `&status=${status}` : ""}`;
 
       const data = await getUserDetails(token, finalQuery);
 
@@ -53,14 +53,14 @@ const finalQuery =
   };
 
 
-useEffect(() => {
-  fetchData(searchTerm,statusFilter,currentPage);
-}, [currentPage]);
+  useEffect(() => {
+    fetchData(searchTerm, statusFilter, currentPage);
+  }, [currentPage]);
 
-const handleSearch = () => {
-  setCurrentPage(1);
-  fetchData(searchTerm,statusFilter,1);
-};
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchData(searchTerm, statusFilter, 1);
+  };
 
 
   const columns = [
@@ -193,7 +193,7 @@ const handleSearch = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <SidebarStatusCard
           label="Email Unverified"
-          count={10}
+          count={analytics.total_email_unverifiedUsers}
           icon={Users}
           color="purple"
           path="/email-unverified"
@@ -201,7 +201,8 @@ const handleSearch = () => {
 
         <SidebarStatusCard
           label="Mobile Unverified"
-          count={20}
+          count={analytics.total_number_unverifiedUsers}
+
           icon={Users}
           color="blue"
           path="/mobile-unverified"
@@ -209,7 +210,7 @@ const handleSearch = () => {
 
         <SidebarStatusCard
           label="KYC Unverified"
-          count={5}
+          count={analytics.totalUnverifiedKycUsers}
           icon={Users}
           color="red"
           path="/kyc-unverified"
@@ -217,7 +218,7 @@ const handleSearch = () => {
 
         <SidebarStatusCard
           label="KYC Pending"
-          count={7}
+          count={analytics.totalPendingKyc}
           icon={Users}
           color="yellow"
           path="/kyc-pending"
@@ -229,52 +230,52 @@ const handleSearch = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           All Users
         </h1>
-      <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3">
 
-  {/* Status Filter */}
-  <div>
-    <select
-      value={statusFilter}
-onChange={(e) => {
-  const value = e.target.value;
-  setStatusFilter(value);
-  setCurrentPage(1);
-  fetchData(searchTerm, value, 1);
-}}
-      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-    >
-     <option value="">All Status</option>
+          {/* Status Filter */}
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                const value = e.target.value;
+                setStatusFilter(value);
+                setCurrentPage(1);
+                fetchData(searchTerm, value, 1);
+              }}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">All Status</option>
 
-  <option value="active_users">Active</option>
-  <option value="banned_users">Blocked</option>
+              <option value="active_users">Active</option>
+              <option value="banned_users">Blocked</option>
 
-  <option value="unverified_email_users">Unverified Email</option>
-  <option value="unverified_number_users">Unverified Number</option>
+              <option value="unverified_email_users">Unverified Email</option>
+              <option value="unverified_number_users">Unverified Number</option>
 
-  <option value="unverified_kyc_users">Unverified KYC</option>
-  <option value="pending_kyc_users">Pending KYC</option>
-    </select>
-  </div>
+              <option value="unverified_kyc_users">Unverified KYC</option>
+              <option value="pending_kyc_users">Pending KYC</option>
+            </select>
+          </div>
 
-  {/* Search Box */}
-  <div className="flex flex-1">
-    <input
-      type="text"
-      placeholder="Username / Email"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="pl-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-    />
-    <button
-      type="button"
-      onClick={handleSearch}
-      className="px-4 bg-primary-500 text-white rounded-r-lg hover:bg-primary-600 focus:outline-none flex items-center justify-center border border-primary-500"
-    >
-      <Search size={16} />
-    </button>
-  </div>
+          {/* Search Box */}
+          <div className="flex flex-1">
+            <input
+              type="text"
+              placeholder="Username / Email"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="px-4 bg-primary-500 text-white rounded-r-lg hover:bg-primary-600 focus:outline-none flex items-center justify-center border border-primary-500"
+            >
+              <Search size={16} />
+            </button>
+          </div>
 
-</div>
+        </div>
 
 
       </div>

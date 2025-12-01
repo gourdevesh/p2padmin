@@ -64,4 +64,6 @@ export interface NavigationItem {
   path?: any;
   badge?: number;
   children?: NavigationItem[];
+    permission?: string;
+
 }

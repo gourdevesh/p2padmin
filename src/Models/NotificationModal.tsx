@@ -44,12 +44,34 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 relative">
                 {/* Header */}
-                <h2 className="text-xl font-bold mb-4 text-gray-800">
-                    Send Notification
-                </h2>
+         <div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-bold text-gray-800">
+        Send Notification
+    </h2>
+
+    <button 
+                            onClick={onClose}
+        className="text-gray-600 hover:text-gray-900"
+    >
+        ✖
+    </button>
+</div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    
+                    <div>
+                        <label className="block text-gray-700 font-medium mb-1">User ID</label>
+                        <input
+                        disabled
+                            type="text"
+                            name="user_id"
+                            value={formData.user_id}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                    </div>
+
                     <div>
                         <label className="block text-gray-700 font-medium mb-1">Title</label>
                         <input
@@ -88,18 +110,6 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                             <option value="System_alert">System Alert</option>
                             <option value="User_message">User Message</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-1">User ID</label>
-                        <input
-                        disabled
-                            type="text"
-                            name="user_id"
-                            value={formData.user_id}
-                            onChange={handleChange}
-                            className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
                     </div>
 
                     {/* Buttons */}

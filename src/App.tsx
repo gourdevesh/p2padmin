@@ -62,6 +62,7 @@ import UserTradeLimit from './pages/ManageUsers/UserTradeLimit';
 import IdVerification from './pages/ManageUsers/IdVerification';
 import { UsersAddressVerifications } from './pages/ManageUsers/UserAddressVerifications';
 import { NewUserRegistration } from './pages/ManageUsers/NewUserRegistration';
+import UpdateAdmin from './pages/Admin/UpdateAdmin';
 function AppRoutes() {
   const location = useLocation();
 
@@ -119,6 +120,7 @@ function AppRoutes() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/system-setting" element={<SystemSettings />} />
           <Route path="/add-admin" element={<AddAdmin />} />
+         <Route path="/update-admin" element={<UpdateAdmin />} />
           <Route path="/dispute-details" element={<DisputeDetail />} />
           <Route path="/wallet" element={<WalletPaymentCards />} />
           <Route path="/global-payment" element={<GlobalPaymentForm />} />

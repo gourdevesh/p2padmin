@@ -24,7 +24,7 @@ interface PriceData {
   binancecoin?: { inr: number };
 }
 
-export const useCryptoOption = (user_id: number): CryptoOption[] => {
+export const useCryptoOptions = (): CryptoOption[] => {
   const [walletData, setWalletData] = useState<any>({});
   const [price, setPrice] = useState<PriceData | null>(null);
 
@@ -36,6 +36,7 @@ export const useCryptoOption = (user_id: number): CryptoOption[] => {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
 
+      const user_id = 113; // NUMBER
       const finalQuery = `&user_id=${user_id}`;
       const data = await getUserDetails(token, finalQuery);
 

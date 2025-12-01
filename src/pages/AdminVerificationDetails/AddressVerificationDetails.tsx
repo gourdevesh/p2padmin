@@ -14,15 +14,18 @@ export const AddressVerificationDetails: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedData, setSelectedData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [country, setcountry] = useState("");
 
-  const fetchData = async (status: string = "", page: number = 1) => {
+  const fetchData = async (status: string = "", country: string = "", page: number = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
-
-      const finalQuery = `page=${page}${status ? `&status=${status}` : ""}`;
-      const data = await getAddressVerificationDetails(token, finalQuery);
+      let query = `page=${page}`;
+      if (status) query += `&status=${status}`;
+      if (country) query += `&residence_country=${country}`;
+      // const finalQuery = `page=${page}${status ? `&status=${status}` : ""}`;
+      const data = await getAddressVerificationDetails(token, query);
 
       setAddressDetails(data?.data || []);
       setCurrentPage(data?.pagination?.current_page || 1);
@@ -36,8 +39,8 @@ export const AddressVerificationDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(statusFilter, currentPage);
-  }, [currentPage, statusFilter]);
+    fetchData(statusFilter, country, currentPage);
+  }, [currentPage, country, statusFilter]);
 
 
   const handleUpdateClick = (row: any) => {
@@ -54,7 +57,7 @@ export const AddressVerificationDetails: React.FC = () => {
 
   const columns = [
     { key: "doc_type", label: "Document Type", sortable: true },
-             { key: "user_id", label: "user Id", sortable: true },
+    { key: "user_id", label: "user Id", sortable: true },
     { key: "residence_country", label: "Country", sortable: true },
     { key: "residence_State", label: "State", sortable: true },
     { key: "address_line1", label: "Address Line 1" },
@@ -94,12 +97,12 @@ export const AddressVerificationDetails: React.FC = () => {
       render: (value: string) => (
         <span
           className={`px-2 py-1 rounded text-xs font-medium capitalize ${value === "verified"
-              ? "bg-green-100 text-green-700"
-              : value === "pending"
-                ? "bg-yellow-100 text-yellow-700"
-                : value === "rejected"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-gray-100 text-gray-700"
+            ? "bg-green-100 text-green-700"
+            : value === "pending"
+              ? "bg-yellow-100 text-yellow-700"
+              : value === "rejected"
+                ? "bg-red-100 text-red-700"
+                : "bg-gray-100 text-gray-700"
             }`}
         >
           {value}
@@ -140,20 +143,28 @@ export const AddressVerificationDetails: React.FC = () => {
 
         {/* Status Filter */}
         <div className="flex items-center space-x-2">
-           <label
+          {/* Country Filter */}
+          <label
             htmlFor="country"
             className="text-lg font-medium text-gray-700 dark:text-gray-300"
           >
             Country:
           </label>
-            <select
-    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-  >
-    <option value="">All Countries</option>
-    <option value="India">India</option>
-    <option value="USA">USA</option>
-    <option value="UK">UK</option>
-  </select>
+          <select
+            id="country"
+            value={country} // bind value
+            onChange={(e) => {
+              setCurrentPage(1); // reset page on filter change
+              setcountry(e.target.value); // update country state
+            }}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="">All Countries</option>
+            <option value="india">India</option>
+            <option value="USA">USA</option>
+            <option value="UK">UK</option>
+          </select>
+
           <label
             htmlFor="status"
             className="text-lg font-medium text-gray-700 dark:text-gray-300"

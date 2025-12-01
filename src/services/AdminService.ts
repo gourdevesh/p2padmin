@@ -33,3 +33,26 @@ export const logOutUser = async () => {
       throw err;
     });
 };
+
+
+// =============================
+// UPDATE ADMIN SERVICE
+// =============================
+export const updateAdmin = async (id: string | number, values: any) => {
+  try {
+    const response = await api.put("/auth/updateAdmin", values);
+
+    return {
+      status: response.data?.status ?? false,
+      message: response.data?.message ?? "Admin updated successfully",
+      data: response.data?.data ?? null,
+    };
+  } catch (error: any) {
+    return {
+      status: false,
+      message: error.response?.data?.message || "Failed to update admin",
+      data: null,
+    };
+  }
+};
+
