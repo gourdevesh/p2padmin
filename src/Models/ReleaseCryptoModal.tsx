@@ -1,72 +1,93 @@
 import React, { useState } from "react";
+import { adminResolveDispute } from "../services/SupportTicketService";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface ReleaseCryptoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (method: string) => void;
+  trade_id: number;
   buyerName?: string;
 }
 
 const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
   isOpen,
   onClose,
-  onConfirm,
-  buyerName = "the Buyer",
+  trade_id,
+  buyerName,
 }) => {
-  const [method, setMethod] = useState("wallet");
+  const [method, setMethod] = useState<"buyer" | "seller">("buyer");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const handleConfirm = async () => {
+    setLoading(true);
+
+    try {
+      const response = await adminResolveDispute({
+        trade_id: trade_id, // camelCase
+        decision: method,
+      });
+
+      if (response?.status === true) {
+        toast.success("Crypto released successfully!");
+        onClose();
+        navigate("/disputes")
+      } else {
+        toast.error(response?.message || "Something went wrong!");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 flex items-start justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
-    >
-      <div
-        className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] mt-10 p-4 sm:p-6 transform transition-all duration-500 ease-out ${isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 "
-          }`}
-      >
-        <div className="flex justify-between items-center mb-4 border-b -mx-4 sm:-mx-6 pb-3">
-          <h2 className="text-[18px] sm:text-[20px] font-semibold mx-4 sm:mx-6">
-            Confirm Crypto Release
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[33%] p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+            Release Crypto
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-white mx-4 sm:mx-6 text-[16px]"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-white">
             ✕
           </button>
         </div>
 
-        <div className="mb-4 border-b pb-4 -mx-4 sm:-mx-6 dark:text-white">
-          <p className="text-gray-600 mx-4 sm:mx-6 text-[14px] sm:text-[15px] dark:text-white">
-            Are you sure you want to release crypto? This action cannot be undone.
-          </p>
+        <p className="mb-4 text-gray-600 dark:text-white">
+          Are you sure you want to release crypto to  This action is irreversible.
+        </p>
 
-          {/* Option to select send method */}
-          <div className="mt-3 mx-4 sm:mx-6">
-            <label className="block text-sm font-medium mb-1">Send via:</label>
-            <select
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-              className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:text-white"
-            >
-              <option value="exchange">Mukesh Rai</option>
-              <option value="manual">Devashish Rajbhar</option>
-            </select>
-          </div>
-        </div>
+        <label className="block mb-3 text-sm font-medium text-gray-700 dark:text-white">
+          Decision (Winner):
+        </label>
+        <select
+          value={method}
+          onChange={(e) => setMethod(e.target.value as "buyer" | "seller")}
+          className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:text-white mb-4"
+        >
+          <option value="buyer">Decision in favour of Buyer</option>
+          <option value="seller">Decision in favour of Seller</option>
+        </select>
 
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="bg-gray-800 text-white px-3 sm:px-4 py-2 rounded hover:bg-gray-900 text-[13px] sm:text-[14px]"
+            disabled={loading}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           >
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(method)}
-            className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-green-700 text-[13px] sm:text-[14px]"
+            onClick={handleConfirm}
+            disabled={loading}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
-            Release
+            {loading ? "Processing..." : "Confirm"}
           </button>
         </div>
       </div>

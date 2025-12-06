@@ -25,7 +25,7 @@ const CancelTradeModal: React.FC<CancelTradeModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center mb-4 border-b -mx-4 sm:-mx-6 pb-3">
           <h2 className="text-[18px] sm:text-[20px] font-semibold mx-4 sm:mx-6 text-red-600 dark:text-red-400">
-            Cancel Trade
+            Close Dispute
           </h2>
           <button
             onClick={onClose}
@@ -38,7 +38,7 @@ const CancelTradeModal: React.FC<CancelTradeModalProps> = ({
         {/* Message */}
         <div className="mb-4 border-b pb-4 -mx-4 sm:-mx-6 dark:text-white">
           <p className="text-gray-700 mx-4 sm:mx-6 text-[14px] sm:text-[15px] dark:text-white">
-            Are you sure you want to cancel this trade{" "}
+            Are you sure you want to close this dispute{" "}
             {tradeId ? (
               <span className="font-semibold text-red-600 dark:text-red-400">
                 #{tradeId}

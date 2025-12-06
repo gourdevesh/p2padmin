@@ -3,7 +3,6 @@ import { User, CreditCard, ArrowLeft } from "lucide-react";
 import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { Dialog } from "@headlessui/react";
 import { db } from "./Config/firebaseConfig";
-import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
 import PredefinedMessageModal from "../Models/PredefinedMessageModal";
 import { useCryptoOption } from "./Store/cryptoOption";
 import { getTransactionDetails } from "../services/TransactionService";
@@ -14,6 +13,8 @@ import { cancelTrade } from "../services/TradeHistory";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCryptoOptions } from "./Store/cryptoOption2";
+import { closeDisputeByAdmin, sendEvidenceRequired } from "../services/SupportTicketService";
+import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
 
 interface Media {
   url: string;
@@ -59,7 +60,7 @@ export const DisputeDetail: React.FC = () => {
 
   const dispute = {
     // Reporter → ticket बनाने वाला
-    reporter: row?.reporter_details?.name || "Unknown",
+    reporter: row?.reporter_details?.username || "Unknown",
 
     // Reported → buyer या seller में से दूसरा user
     reported: row?.reported_details?.username,
@@ -109,6 +110,7 @@ export const DisputeDetail: React.FC = () => {
   const [result, setResult] = useState("buyer");
   const [openCancelModal, setOpenCancelModal] = React.useState(false);
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
   const [tradeInfo, setTradeInfo] = useState<{
     amount: string;
     assetValue: string;
@@ -210,6 +212,32 @@ export const DisputeDetail: React.FC = () => {
 
   console.log("messages", messages)
 
+  const requestEvidenceEmail = async () => {
+    try {
+      setLoading(true); // start loading
+      const payload = {
+        trade_id: dispute.tradeId,
+        user_id: row?.reporter_details?.user_id, // or reported_details depending on who should receive email
+        evidence_deadline_hours: 24, // deadline in hours
+      };
+
+      const data = await sendEvidenceRequired(payload); // axios call returns data directly
+      if (data.status) {
+        toast.success("Evidence request email sent successfully!");
+        await sendSystemMessage(
+          "⚠️ Admin requested additional evidence for this dispute."
+        );
+      } else {
+        toast.error(`❌ ${data.message || "Failed to send email"}`);
+      }
+    } catch (error: any) {
+      console.error("Error sending evidence email:", error);
+      toast.error(`❌ ${error.message || "Something went wrong"}`);
+    }
+    finally {
+      setLoading(false); // stop loading
+    }
+  };
 
 
   return (
@@ -318,8 +346,9 @@ export const DisputeDetail: React.FC = () => {
             <ReleaseCryptoModal
               isOpen={openReleaseModal}
               onClose={() => setOpenReleaseModal(false)}
-              onConfirm={handleReleaseCrypto}
-              buyerName={dispute.reporter} // dynamically show buyer
+              trade_id={Number(dispute.tradeId)}
+              buyerName={dispute.reporter}
+
             />
             <PredefinedMessageModal
               isOpen={openPredefinedModal}
@@ -353,7 +382,7 @@ export const DisputeDetail: React.FC = () => {
                   className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
                   onClick={handleCancelTrade}
                 >
-                  Cancel Trade
+                  close dispute
                 </button>
                 <button
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
@@ -361,6 +390,14 @@ export const DisputeDetail: React.FC = () => {
                 >
                   New Trade
                 </button>
+                <button
+                  disabled={loading}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow"
+                  onClick={requestEvidenceEmail}
+                >
+                  {loading ? "Sending..." : "Request Evidence"}
+                </button>
+
               </div>
             </div>
             <NewTradeModal
@@ -375,19 +412,25 @@ export const DisputeDetail: React.FC = () => {
                 if (!window.confirm("⚠️ Are you sure you want to cancel this trade?")) return;
 
                 try {
-                  const tradeDto = { trade_id: 456 };
-                  const token = localStorage.getItem("authToken");
+                  const token = localStorage.getItem("authToken") || "";
 
-                  // const response = await cancelTrade(tradeDto, token || "");
-                  toast.info("⏳ Cancelling trade...");
+
+                  // ===== CALL YOUR API =====
+                  const response = await closeDisputeByAdmin(row.ticket_id, token || "");
+                  toast.success("✅ dispute close successfully!");
+                  navigate("/dispute")
+                  // ===== OPTIONAL: SEND CHAT MESSAGE =====
                   await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
+
 
                   setTradeInfo(null);
                   setOpenCancelModal(false);
+
                 } catch (err: any) {
-                  alert(`❌ ${err.message}`);
+                  toast.error(`❌ ${err.message || "Something went wrong"}`);
                 }
               }}
+
             />
 
           </div>
@@ -428,72 +471,72 @@ export const DisputeDetail: React.FC = () => {
             </div>
           </div>
         )}
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-  {/* ✅ First Crypto Holdings Card */}
-  <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
-    <h2 className="font-semibold text-lg mb-3">
-      Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
-{row?.reporter_details?.name}</span>
-    </h2>
-    <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
-      <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-        <tr>
-          <th className="p-2 text-left">Coin</th>
-          <th className="p-2 text-left">Symbol</th>
-          <th className="p-2 text-left">Quantity</th>
-          <th className="p-2 text-left">Price</th>
-          <th className="p-2 text-left">Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        {cryptoOptions.map((h, index) => (
-          <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-            <td className="p-2">{h.shrotName}</td>
-            <td className="p-2">{h.name}</td>
-            <td className="p-2">{h.blc.toFixed(8)}</td>
-            <td className="p-2">₹ {h.pricePerCoin.toLocaleString("en-IN")}</td>
-            <td className="p-2">
-              ₹ {(h.currentPrice * h.blc).toLocaleString("en-IN", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+          {/* ✅ First Crypto Holdings Card */}
+          <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
+            <h2 className="font-semibold text-lg mb-3">
+              Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
+                {row?.reporter_details?.username}</span>
+            </h2>
+            <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
+              <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                <tr>
+                  <th className="p-2 text-left">Coin</th>
+                  <th className="p-2 text-left">Symbol</th>
+                  <th className="p-2 text-left">Quantity</th>
+                  <th className="p-2 text-left">Price</th>
+                  <th className="p-2 text-left">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cryptoOptions.map((h, index) => (
+                  <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="p-2">{h.shrotName}</td>
+                    <td className="p-2">{h.name}</td>
+                    <td className="p-2">{h.blc.toFixed(8)}</td>
+                    <td className="p-2">₹ {h.pricePerCoin.toLocaleString("en-IN")}</td>
+                    <td className="p-2">
+                      ₹ {(h.currentPrice * h.blc).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-  {/* ✅ Second Crypto Holdings Card */}
-  <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
-    <h2 className="font-semibold text-lg mb-3">
-      Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
-{row?.reported_details?.username}</span>
-    </h2>
-    <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
-      <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-        <tr>
-          <th className="p-2 text-left">Coin</th>
-          <th className="p-2 text-left">Symbol</th>
-          <th className="p-2 text-left">Quantity</th>
-          <th className="p-2 text-left">Price</th>
-          <th className="p-2 text-left">Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        {cryptoOption.map((h, index) => (
-          <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-            <td className="p-2">{h.shrotName}</td>
-            <td className="p-2">{h.shrotName}</td>
-            <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
-            <td className="p-2">₹ {h.pricePerCoin}</td>
-            <td className="p-2">₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+          {/* ✅ Second Crypto Holdings Card */}
+          <div className="bg-white p-5 rounded-xl shadow-md overflow-x-auto dark:bg-gray-700 dark:text-gray-200">
+            <h2 className="font-semibold text-lg mb-3">
+              Crypto Holdings —   <span className="text-indigo-600 dark:text-white">
+                {row?.reported_details?.username}</span>
+            </h2>
+            <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
+              <thead className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                <tr>
+                  <th className="p-2 text-left">Coin</th>
+                  <th className="p-2 text-left">Symbol</th>
+                  <th className="p-2 text-left">Quantity</th>
+                  <th className="p-2 text-left">Price</th>
+                  <th className="p-2 text-left">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cryptoOption.map((h, index) => (
+                  <tr key={index} className="border-t border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="p-2">{h.shrotName}</td>
+                    <td className="p-2">{h.shrotName}</td>
+                    <td className="p-2">{Number(h.blc ?? 0).toFixed(8)}</td>
+                    <td className="p-2">₹ {h.pricePerCoin}</td>
+                    <td className="p-2">₹ {((h.currentPrice ?? 0) * (h.blc ?? 0)).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
 
 

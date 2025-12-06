@@ -3,7 +3,7 @@ import { Search, Users } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../utils/toast";
-import { getSupportTicket } from "../services/SupportTicketService";
+import { disputeOpened, getSupportTicket } from "../services/SupportTicketService";
 import { Table } from "../components/Table";
 import { SidebarStatusCard } from "../components/UserStatusCard";
 
@@ -18,7 +18,8 @@ export const Disputes
         const navigate = useNavigate()
         const [statusFilter, setStatusFilter] = useState("");
         const [analytics, setAnalytics] = useState<any>(null);
-
+const [loadingRowId, setLoadingRowId] = useState(null);
+ 
         const fetchData = async (query: string = "", page: number = 1) => {
             try {
                 setLoading(true);
@@ -27,14 +28,14 @@ export const Disputes
                 let finalQuery = `page=${page}`;
 
                 // Search filter
-             // Smart Search → trade_id OR ticket_number
-if (query) {
-    if (/^\d+$/.test(query)) {
-        finalQuery += `&trade_id=${query}`;   // search by trade ID
-    } else {
-        finalQuery += `&ticket_number=${query}`; // search by ticket number
-    }
-}
+                // Smart Search → trade_id OR ticket_number
+                if (query) {
+                    if (/^\d+$/.test(query)) {
+                        finalQuery += `&trade_id=${query}`;   // search by trade ID
+                    } else {
+                        finalQuery += `&ticket_number=${query}`; // search by ticket number
+                    }
+                }
 
                 // Status filter (NEW)
                 if (statusFilter) {
@@ -67,14 +68,43 @@ if (query) {
         };
 
         // ✅ Accept the row as argument
-        const handleDisputeAction = (row: any) => {
-            console.log("Selected ticket/trade:", row);
-            navigate('/dispute-details', { state: { row } }); // pass row via state if needed
+        const handleDisputeAction = async (row: any) => {
+            try {
+        setLoadingRowId(row.ticket_number);
+                console.log("Selected ticket/trade:", row);
+
+                const token = localStorage.getItem("authToken") || "";
+
+                // Prepare payload
+                const payload = {
+                    trade_id: row?.trade_details?.trade_id,
+                    user_name: row?.reporter_details?.username,
+                    side: row?.reporter_details?.role === "seller" ? "Seller" : "Buyer",
+                    counterparty_name: row?.reported_details?.username,
+                    dispute_reason: row?.subject || "Not provided",
+                    email: row?.reporter_details?.email,
+                };
+
+                // Call API through service
+                const response = await disputeOpened(payload, token);
+
+                console.log("Email sent!", response);
+
+                // Navigate after email sent
+                navigate('/dispute-details', { state: { row } });
+
+            } catch (err: any) {
+                console.error("Error:", err.message);
+            }
+            finally{
+        setLoadingRowId(null);
+            }
         };
 
         console.log("analytics", analytics)
 
         const columns = [
+
             {
                 key: "name",
                 label: "dispute",
@@ -97,7 +127,13 @@ if (query) {
                 key: "user",
                 label: "Submitted By",
                 sortable: true,
-                render: (value: any, row: any) => row?.user?.name ?? "N/A",
+                render: (value: any, row: any) => row?.reporter_details?.username ?? "N/A",
+            },
+              {
+                key: "tradeId",
+                label: "tradeId",
+                sortable: true,
+                render: (value: any, row: any) => row?.trade_details?.trade_id ?? "N/A",
             },
             {
                 key: "status",
@@ -151,11 +187,12 @@ if (query) {
                 label: "Actions",
                 render: (value: any, row: any) => (
                     <button
+  disabled={loadingRowId === row?.ticket_number}
                         type="button"
                         className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
                         onClick={() => handleDisputeAction(row)} // pass the row
                     >
-                        Details
+  {loadingRowId === row?.ticket_number ? "Loading..." : "Details"}
                     </button>
                 ),
             }
