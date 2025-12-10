@@ -67,13 +67,17 @@ export const Admin: React.FC = () => {
       ),
     },
     { key: "role", label: "role", sortable: true },
-{
+ {
   key: "permissions",
   label: "Permissions",
   render: (value: any, row: any) => {
     // Case 1: null / undefined / empty → show "—"
     if (!row.permissions || row.permissions.length === 0) {
-      return <span className="text-sm text-gray-700">—</span>;
+      return (
+        <span className="text-sm text-gray-700 dark:text-gray-200">
+          —
+        </span>
+      );
     }
 
     // Case 2: show first 2 permissions only
@@ -83,7 +87,7 @@ export const Admin: React.FC = () => {
     const extraCount = perms.length > 2 ? ` +${perms.length - 2} more` : "";
 
     return (
-      <span className="text-sm text-gray-700 whitespace-nowrap">
+      <span className="text-sm text-gray-700 dark:text-gray-200 whitespace-nowrap">
         {displayPerms}
         {extraCount}
       </span>
@@ -94,22 +98,22 @@ export const Admin: React.FC = () => {
 
     { key: "email", label: "email", sortable: true },
     { key: "admin_status", label: "admin_status", sortable: true },
-{
-  key: "actions",
-  label: "Actions",
-  render: (value: any, row: any) => (
-    <button
-      onClick={() =>
-        navigate("/update-admin", {
-          state: { rowData: row },
-        })
-      }
-      className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-    >
-      Update
-    </button>
-  ),
-},
+    {
+      key: "actions",
+      label: "Actions",
+      render: (value: any, row: any) => (
+        <button
+          onClick={() =>
+            navigate("/update-admin", {
+              state: { rowData: row },
+            })
+          }
+          className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+        >
+          Update
+        </button>
+      ),
+    },
   ];
 
   return (

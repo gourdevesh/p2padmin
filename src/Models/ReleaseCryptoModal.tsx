@@ -13,6 +13,7 @@ interface ReleaseCryptoModalProps {
 const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
   isOpen,
   onClose,
+  
   trade_id,
   buyerName,
 }) => {

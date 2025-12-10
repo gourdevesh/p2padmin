@@ -1,18 +1,24 @@
 import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
+import { sendSystemMessageAPI } from "../services/SupportTicketService";
+import { toast } from "react-toastify";
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { db } from "../pages/Config/firebaseConfig";
 
 interface PredefinedMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSend: (message: string) => void;
   predefinedMessages?: string[];
+  tradeId?: number | null;
+  userId?: number | null;
 }
 
 const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
   isOpen,
   onClose,
-  onSend,
+  userId,
+  tradeId,
   predefinedMessages = [
     "Hello, your order is being processed.",
     "Please provide the required documents.",
@@ -20,12 +26,55 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
   ],
 }) => {
   const [selectedMessage, setSelectedMessage] = useState("");
+  const [loading, setLoading] = useState(false)
+  const idTrade = `tradeId: ${tradeId}`;
 
-  const handleSend = () => {
-    if (!selectedMessage) return;
-    onSend(selectedMessage);
-    setSelectedMessage(""); // reset
+  const sendSystemMessage = async (text: string) => {
+    if (!tradeId) return;
+    try {
+      const messageRef = collection(db, "UserToUserChats", idTrade, "messages");
+      const timestamp = new Date().toISOString();
+      await addDoc(messageRef, {
+        text,
+        createdAt: timestamp,
+        user: {
+          firstName: "System",
+          role: "admin",
+        },
+        type: "system",
+      });
+      console.log("System message sent ✅");
+    } catch (error) {
+      console.error("Error sending system message:", error);
+    }
   };
+
+  const handleSend = async () => {
+    if (!selectedMessage || !tradeId || !userId) {
+      toast.error("Please select a message and make sure trade/user IDs are available");
+      return;
+    }
+
+    try {
+      setLoading(true)
+      const token = localStorage.getItem("token") || "";
+      const response = await sendSystemMessageAPI(tradeId, userId, token, selectedMessage);
+      await sendSystemMessage(selectedMessage);
+
+      console.log("Message sent successfully:", response);
+      toast.success("Message sent successfully");
+      setSelectedMessage(""); // reset after sending
+      onClose(); // optionally close modal
+    } catch (error: any) {
+      console.error("Failed to send message:", error);
+      toast.error(error.message || "Failed to send message");
+    }
+    finally {
+      setLoading(false)
+    }
+  };
+
+
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -98,10 +147,12 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
                     Cancel
                   </button>
                   <button
-                    onClick={handleSend}
+                    disabled={loading}
+                    onClick={() => handleSend()} // pass no arguments here
                     className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 text-sm"
                   >
-                    Send
+                    {loading ? "Sending..." : "Send"}
+
                   </button>
                 </div>
 

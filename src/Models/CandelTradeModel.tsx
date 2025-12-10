@@ -4,6 +4,7 @@ interface CancelTradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  disloading: boolean;
   tradeId?: string;
 }
 
@@ -12,6 +13,7 @@ const CancelTradeModal: React.FC<CancelTradeModalProps> = ({
   onClose,
   onConfirm,
   tradeId,
+  disloading
 }) => {
   return (
     <div
@@ -58,12 +60,18 @@ const CancelTradeModal: React.FC<CancelTradeModalProps> = ({
           >
             No, Keep Trade
           </button>
-          <button
-            onClick={onConfirm}
-            className="bg-red-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-red-700 text-[13px] sm:text-[14px]"
-          >
-            Yes, Cancel Trade
-          </button>
+        <button
+  disabled={disloading}
+  onClick={onConfirm}
+  className="bg-red-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-red-700 text-[13px] sm:text-[14px] flex items-center gap-2"
+>
+  {disloading ? (
+    <span className="animate-pulse">⏳ Cancelling...</span>
+  ) : (
+    "Yes, Cancel Trade"
+  )}
+</button>
+
         </div>
       </div>
     </div>

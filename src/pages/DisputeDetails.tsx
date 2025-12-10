@@ -13,8 +13,9 @@ import { cancelTrade } from "../services/TradeHistory";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCryptoOptions } from "./Store/cryptoOption2";
-import { closeDisputeByAdmin, sendEvidenceRequired } from "../services/SupportTicketService";
+import { cancelTradeByAdmin, closeDisputeByAdmin, resertNewTrade, sendEvidenceRequired, sendSystemMessageAPI } from "../services/SupportTicketService";
 import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
+import { showToast } from "../utils/toast";
 
 interface Media {
   url: string;
@@ -56,8 +57,8 @@ export const DisputeDetail: React.FC = () => {
 
   const row = location.state?.row;
   console.log("rowdeatils", row)
-  const tradeId = `tradeId: ${row?.trade_details?.trade_id}`;
-
+  const tradeId = `tradeId:${row?.trade_details?.trade_id}`;
+console.log("tradeId22",tradeId)
   const dispute = {
     // Reporter → ticket बनाने वाला
     reporter: row?.reporter_details?.username || "Unknown",
@@ -111,6 +112,10 @@ export const DisputeDetail: React.FC = () => {
   const [openCancelModal, setOpenCancelModal] = React.useState(false);
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);   // ✔ REQUIRED
+  const [disloading, setDisLoading] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedTradeId, setSelectedTradeId] = useState<number | null>(null);
   const [tradeInfo, setTradeInfo] = useState<{
     amount: string;
     assetValue: string;
@@ -118,33 +123,97 @@ export const DisputeDetail: React.FC = () => {
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleTrade = async (data: any) => {
-    const confirmCancel = window.confirm("⚠️ Are you sure you want to cancel the previous trade?");
-    if (!confirmCancel) return;
-
+  const handleTrade = async (tradeData: any) => {
     try {
-      toast.info("⏳ Cancelling previous trade...");
-      await sendSystemMessage("⚠️ Admin has cancelled this trade due to dispute resolution.");
+      setIsLoading(true);
+      const token = localStorage.getItem("token") || "";
 
-      setTradeInfo(data);
+      const selectedTradeId = row?.trade_details?.trade_id;
+      if (!selectedTradeId) {
+        showToast("error", "❌ No trade selected to cancel.");
+        return;
+      }
 
-      await sendSystemMessage("⚠️ Admin has started a new trade for dispute resolution.");
+      const confirmCancel = window.confirm(
+        "⚠️ Are you sure you want to cancel the previous trade?"
+      );
+      if (!confirmCancel) return;
 
-      toast.success("✅ New trade created successfully!");
-    } catch (error) {
+      // 🚫 --- CANCEL API  CALL ---
+      const cancelRes = await cancelTradeByAdmin(selectedTradeId, token);
+
+      // ❌ Agar cancel API FAIL ho → Aage ka code NA CHALE
+      if (!cancelRes || cancelRes.status !== true) {
+        showToast("error", cancelRes?.message || "❌ Trade cancellation failed!");
+        return;
+      }
+
+      // ✅ Cancel success
+      showToast("success", "✅ Previous trade cancelled successfully.");
+
+      // 🆕 Ask for new trade only after cancel success
+      const confirmNewTrade = window.confirm(
+        "🆕 Do you want to start a new trade with updated amount & crypto?"
+      );
+      if (!confirmNewTrade) return;
+
+      showToast("info", "⏳ Creating new trade...");
+
+      // 🚫 --- NEW TRADE CREATION ---
+      const newTradeRes = await resertNewTrade(selectedTradeId, tradeData, token);
+
+      // ❌ Agar new trade fail → Stop
+      if (!newTradeRes || newTradeRes.status !== true) {
+        showToast("error", newTradeRes?.message || "❌ Failed to create new trade!");
+        return;
+      }
+
+      await sendSystemMessage("⚠️ Previous trade cancelled by admin.");
+      await sendSystemMessage("🆕 Admin has started a new trade with updated amount & crypto.");
+
+      setTradeInfo(tradeData);
+
+      showToast("success", "✅ New trade created successfully!");
+      navigate("/disputes")
+      // Close modal AFTER both processes succeed
+      setOpenCancelModal(false);
+
+    } catch (error: any) {
       console.error("Error handling trade:", error);
-      toast.error("❌ Something went wrong while creating the new trade.");
+      showToast("error", error?.message || "❌ Something went wrong while creating a new trade.");
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   const handleCancelTrade = () => {
     setOpenCancelModal(true);
 
   }
 
-  const handleSendPredefinedMessage = () => {
-    console.log("Send message:", selectedMessage);
-    setOpenPredefinedModal(false);
+  const handleSendPredefinedMessage = async () => {
+    if (!selectedMessage || !selectedTradeId || !selectedUserId) return;
+
+    try {
+      setOpenPredefinedModal(false); // close modal immediately
+      const token = localStorage.getItem("token") || ""; // or your auth token source
+
+      const response = await sendSystemMessageAPI(
+        selectedTradeId,
+        selectedUserId,
+        token,
+        selectedMessage
+      );
+
+      console.log("Message sent successfully:", response);
+      toast.success("Message sent successfully"); // optional notification
+    } catch (error: any) {
+      console.error("Failed to send message:", error);
+      toast.error(error.message || "Failed to send message"); // optional error notification
+    } finally {
+      setSelectedMessage(""); // reset selected message
+    }
   };
 
   const handleReleaseCrypto = () => {
@@ -210,7 +279,7 @@ export const DisputeDetail: React.FC = () => {
     }
   };
 
-  console.log("messages", messages)
+  console.log("messagehdss", messages)
 
   const requestEvidenceEmail = async () => {
     try {
@@ -237,6 +306,13 @@ export const DisputeDetail: React.FC = () => {
     finally {
       setLoading(false); // stop loading
     }
+  };
+
+  const handleOpenMessageModal = (userId: number, tradeId: number) => {
+    alert(userId)
+    setSelectedUserId(userId);
+    setSelectedTradeId(tradeId);
+    setOpenPredefinedModal(true);
   };
 
 
@@ -284,8 +360,9 @@ export const DisputeDetail: React.FC = () => {
                     </span>
                     <button
                       className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-lg"
-                      onClick={() => setOpenPredefinedModal(true)}
-                    >
+                      onClick={() =>
+                        handleOpenMessageModal(row.reporter_details?.user_id, dispute.tradeId)
+                      }                    >
                       Message
                     </button>
                   </div>
@@ -320,7 +397,9 @@ export const DisputeDetail: React.FC = () => {
                     </span>
                     <button
                       className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg"
-                      onClick={() => setOpenPredefinedModal(true)}
+                      onClick={() =>
+                        handleOpenMessageModal(row.reported_details?.user_id, dispute.tradeId)
+                      }
                     >
                       Message
                     </button>
@@ -353,7 +432,8 @@ export const DisputeDetail: React.FC = () => {
             <PredefinedMessageModal
               isOpen={openPredefinedModal}
               onClose={() => setOpenPredefinedModal(false)}
-              onSend={handleSendPredefinedMessage}
+              userId={selectedUserId}
+              tradeId={selectedTradeId}
             />
 
             {/* Trade ID & Release Button */}
@@ -404,17 +484,19 @@ export const DisputeDetail: React.FC = () => {
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               onTrade={handleTrade}
+              isLoading={isLoading}
+
             />
             <CancelTradeModal
               isOpen={openCancelModal}
+              disloading={disloading}
               onClose={() => setOpenCancelModal(false)}
               onConfirm={async () => {
                 if (!window.confirm("⚠️ Are you sure you want to cancel this trade?")) return;
 
                 try {
+                  setDisLoading(true)
                   const token = localStorage.getItem("authToken") || "";
-
-
                   // ===== CALL YOUR API =====
                   const response = await closeDisputeByAdmin(row.ticket_id, token || "");
                   toast.success("✅ dispute close successfully!");
@@ -428,6 +510,9 @@ export const DisputeDetail: React.FC = () => {
 
                 } catch (err: any) {
                   toast.error(`❌ ${err.message || "Something went wrong"}`);
+                }
+                finally {
+                  setDisLoading(false)
                 }
               }}
 

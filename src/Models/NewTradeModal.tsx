@@ -11,6 +11,7 @@ interface NewTradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  isLoading?: boolean;     // ⭐ FIXED
   onTrade?: (data: TradeData) => void; // ✅ send trade data to parent
 }
 
@@ -26,6 +27,7 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
   onClose,
   onSuccess,
   onTrade,
+  isLoading
 }) => {
   const [amount, setAmount] = useState<string>("");
   const [assetValue, setAssetValue] = useState<string>("");
@@ -84,7 +86,6 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
     const tradeData: TradeData = { amount, assetValue, cryptocurrency };
     onTrade?.(tradeData);
     onSuccess?.();
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -124,13 +125,16 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
           <select
             value={cryptocurrency}
             onChange={(e) => setCryptocurrency(e.target.value)}
-            className="w-full border rounded-md px-3 py-2 bg-transparent text-gray-800 dark:text-white"
+            className="w-full border rounded-md px-3 py-2 
+             bg-transparent text-gray-800 
+             dark:bg-white dark:text-black"
           >
             <option value="bitcoin">Bitcoin (BTC)</option>
             <option value="ethereum">Ethereum (ETH)</option>
             <option value="tether">Tether (USDT)</option>
             <option value="binance">Binance Coin (BNB)</option>
           </select>
+
         </div>
 
         {/* Current Rate */}
@@ -200,7 +204,8 @@ const NewTradeModal: React.FC<NewTradeModalProps> = ({
           disabled={!amount || !assetValue}
           className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition"
         >
-          New Trade
+
+          {isLoading ? "⏳ Processing..." : "Release Crypto"}
         </button>
       </div>
     </div>

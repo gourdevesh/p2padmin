@@ -20,43 +20,54 @@ export const Disputes
         const [analytics, setAnalytics] = useState<any>(null);
 const [loadingRowId, setLoadingRowId] = useState(null);
  
-        const fetchData = async (query: string = "", page: number = 1) => {
-            try {
-                setLoading(true);
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No auth token found");
-                let finalQuery = `page=${page}`;
+     const fetchData = async (query: string = "", page: number = 1) => {
+    try {
+        setLoading(true);
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No auth token found");
 
-                // Search filter
-                // Smart Search → trade_id OR ticket_number
-                if (query) {
-                    if (/^\d+$/.test(query)) {
-                        finalQuery += `&trade_id=${query}`;   // search by trade ID
-                    } else {
-                        finalQuery += `&ticket_number=${query}`; // search by ticket number
-                    }
-                }
+        let finalQuery = `page=${page}`;
 
-                // Status filter (NEW)
-                if (statusFilter) {
-                    finalQuery += `&status=${statusFilter}`;
-                }
-
-                const data = await getSupportTicket(token, finalQuery);
-                console.log("get-tickets", data)
-                setAnalytics(data)
-
-                setPendingTickets(data?.data || []);
-
-                setCurrentPage(data?.pagination?.current_page || 1);
-                setTotalPages(data?.pagination?.last_page || 1);
-                setTotalItems(data?.pagination?.total_items || 0);
-            } catch (err: any) {
-                showToast("error", err.message);
-            } finally {
-                setLoading(false);
+        // Search input logic:
+        if (query) {
+            if (/^\d+$/.test(query)) {
+                finalQuery += `&trade_id=${query}`;
+            } else {
+                finalQuery += `&ticket_number=${query}`;
             }
-        };
+        }
+
+        // Status filter
+        if (statusFilter) {
+            finalQuery += `&status=${statusFilter}`;
+        }
+
+        const data = await getSupportTicket(token, finalQuery);
+        console.log("get-tickets", data);
+
+        // 🛑 If no results → Empty table
+        if (!data.status || !data.data || data.data.length === 0) {
+            setPendingTickets([]);          // CLEAR TABLE
+            setTotalPages(1);
+            setTotalItems(0);
+            setAnalytics(data);
+            return;
+        }
+
+        // 🟢 If results found
+        setPendingTickets(data.data);
+        setCurrentPage(data.pagination?.current_page || 1);
+        setTotalPages(data.pagination?.last_page || 1);
+        setTotalItems(data.pagination?.total || 0);
+        setAnalytics(data);
+
+    } catch (err: any) {
+        showToast("error", err.message);
+        setPendingTickets([]); // ERROR par bhi table clear
+    } finally {
+        setLoading(false);
+    }
+};
 
         useEffect(() => {
             fetchData(searchTerm, currentPage);
