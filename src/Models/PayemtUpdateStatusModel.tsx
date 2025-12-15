@@ -19,6 +19,11 @@ const PaymentUpdateStatusModel: React.FC<BankDetailsModalProps> = ({
   const [status, setStatus] = useState<string>("pending");
   const [remark, setRemark] = useState<string>("");
   const [loading, setLoading] = useState(false);
+useEffect(() => {
+  if (status !== "reject") {
+    setRemark("");
+  }
+}, [status]);
 
   useEffect(() => {
     if (isOpen && selectedData) {
@@ -68,7 +73,7 @@ const PaymentUpdateStatusModel: React.FC<BankDetailsModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* ID */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Bank Detail ID
             </label>
@@ -78,37 +83,43 @@ const PaymentUpdateStatusModel: React.FC<BankDetailsModalProps> = ({
               readOnly
               className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </div>
+          </div> */}
 
           {/* Status */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              Status
-            </label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="pending">Pending</option>
-              <option value="verified">Verified</option>
-              <option value="reject">Reject</option>
-            </select>
-          </div>
+     <div>
+  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+    Status
+  </label>
+  <select
+    value={status}
+    onChange={(e) => setStatus(e.target.value)}
+    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  >
+    <option value="pending" disabled>
+      Pending
+    </option>
+    <option value="verified">Verified</option>
+    <option value="reject">Reject</option>
+  </select>
+</div>
 
-          {/* Remark */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              Remark
-            </label>
-            <textarea
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
-              placeholder="Add optional remark"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              rows={3}
-            />
-          </div>
+{/* Remark — only show when status is reject */}
+{status === "reject" && (
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+      Remark
+    </label>
+    <textarea
+      value={remark}
+      onChange={(e) => setRemark(e.target.value)}
+      placeholder="Add rejection remark"
+      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+      rows={3}
+      required
+    />
+  </div>
+)}
+
 
           {/* Buttons */}
           <div className="flex justify-end space-x-3 mt-4">

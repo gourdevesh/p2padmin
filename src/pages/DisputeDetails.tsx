@@ -75,7 +75,7 @@ console.log("tradeId22",tradeId)
 
     // Ticket/Trade Status
     status: row?.status || "pending",
-    result: row?.trade_details?.trade_status || "pending"
+    result: row?.result || "pending"
   };
 
 
@@ -259,7 +259,7 @@ console.log("tradeId22",tradeId)
     fetchData();
   }, []);
 
-  const sendSystemMessage = async (text: string) => {
+    const sendSystemMessage = async (text: string) => {
     if (!tradeId) return;
     try {
       const messageRef = collection(db, "UserToUserChats", tradeId, "messages");
@@ -309,7 +309,6 @@ console.log("tradeId22",tradeId)
   };
 
   const handleOpenMessageModal = (userId: number, tradeId: number) => {
-    alert(userId)
     setSelectedUserId(userId);
     setSelectedTradeId(tradeId);
     setOpenPredefinedModal(true);
@@ -372,12 +371,12 @@ console.log("tradeId22",tradeId)
                       Total: ₹{dispute.price}
                     </p>
 
-                    {dispute.result === "reporter" && (
-                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-                    )}
-                    {dispute.result === "reported" && (
-                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-                    )}
+                  {dispute.result === "buyer" && (
+  <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+)}
+{dispute.result === "seller" && (
+  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+)}
 
 
                   </div>
@@ -410,12 +409,13 @@ console.log("tradeId22",tradeId)
                       Total: ₹{dispute.price}
                     </p>
 
-                    {dispute.result === "reported" && (
-                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-                    )}
-                    {dispute.result === "reporter" && (
-                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-                    )}
+                  {dispute.result === "seller" && (
+  <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+)}
+{dispute.result === "buyer" && (
+  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+)}
+
                   </div>
                 </div>
               </div>
@@ -433,8 +433,8 @@ console.log("tradeId22",tradeId)
               isOpen={openPredefinedModal}
               onClose={() => setOpenPredefinedModal(false)}
               userId={selectedUserId}
-              tradeId={selectedTradeId}
-            />
+              tradeId={tradeId}
+trade_id={selectedTradeId ?? 0}             />
 
             {/* Trade ID & Release Button */}
             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">

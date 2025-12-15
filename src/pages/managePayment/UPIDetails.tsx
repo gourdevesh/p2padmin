@@ -101,6 +101,11 @@ const UPIDetails: React.FC = () => {
             label: "UPI ID",
             sortable: true,
         },
+          {
+            key: "user_id",
+            label: "user ID",
+            sortable: true,
+        },
         // {
         //     key: "qr_code_url",
         //     label: "QR Code",
@@ -187,16 +192,16 @@ const UPIDetails: React.FC = () => {
                 </h2>
 
                 {/* Filters in one row full width */}
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                     {/* ID */}
-                    <input
+                    {/* <input
                         type="text"
                         placeholder="ID"
                         value={filters.id}
                         onChange={(e) => setFilters({ ...filters, id: e.target.value })}
                         className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg 
                bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
+                    /> */}
 
                     {/* User ID */}
                     <input

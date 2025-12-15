@@ -10,8 +10,9 @@ interface PredefinedMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
   predefinedMessages?: string[];
-  tradeId?: number | null;
-  userId?: number | null;
+ tradeId: string | number; // correct type
+   userId?: number | null;
+   trade_id?: number | null;
 }
 
 const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
@@ -19,6 +20,7 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
   onClose,
   userId,
   tradeId,
+  trade_id,
   predefinedMessages = [
     "Hello, your order is being processed.",
     "Please provide the required documents.",
@@ -27,12 +29,11 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
 }) => {
   const [selectedMessage, setSelectedMessage] = useState("");
   const [loading, setLoading] = useState(false)
-  const idTrade = `tradeId: ${tradeId}`;
 
   const sendSystemMessage = async (text: string) => {
     if (!tradeId) return;
     try {
-      const messageRef = collection(db, "UserToUserChats", idTrade, "messages");
+      const messageRef = collection(db, "UserToUserChats",   String(tradeId), "messages");
       const timestamp = new Date().toISOString();
       await addDoc(messageRef, {
         text,
@@ -42,6 +43,8 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
           role: "admin",
         },
         type: "system",
+        visibleTo: [userId] 
+        
       });
       console.log("System message sent ✅");
     } catch (error) {
@@ -54,14 +57,14 @@ const PredefinedMessageModal: React.FC<PredefinedMessageModalProps> = ({
       toast.error("Please select a message and make sure trade/user IDs are available");
       return;
     }
-
+if (!trade_id) return; 
     try {
       setLoading(true)
       const token = localStorage.getItem("token") || "";
-      const response = await sendSystemMessageAPI(tradeId, userId, token, selectedMessage);
+      const response = await sendSystemMessageAPI(trade_id, userId, token, selectedMessage);
       await sendSystemMessage(selectedMessage);
 
-      console.log("Message sent successfully:", response);
+      // console.log("Message sent successfully:", response);
       toast.success("Message sent successfully");
       setSelectedMessage(""); // reset after sending
       onClose(); // optionally close modal
