@@ -23,7 +23,7 @@ export const Advertisements
 
         const navigate = useNavigate()
         const [isModalOpen, setIsModalOpen] = useState(false);
-        const [selectedAd, setSelectedAd] = useState<{ ad_id: number; is_active: number } | null>(null);
+        const [selectedAd, setSelectedAd] = useState<{ ad_id: number; is_active: boolean; action?: string } | null>(null);
 
         const fetchData = async (query: string = "", page: number = 1) => {
             try {
@@ -36,7 +36,7 @@ export const Advertisements
                     }`;
 
                 const data = await getAdvertisements(token, finalQuery);
-                    setUsers(data?.data || {});
+                setUsers(data?.data || {});
 
                 // if (data?.data) {
                 //     const decrypted = await decryptData(data?.data, token);
@@ -103,10 +103,10 @@ export const Advertisements
 
                         <div className="ml-3">
                             <p className="font-medium text-gray-900 dark:text-white">
-                                {row?.user?.name}
+                                {row?.user?.username}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                @{row?.user?.username}
+                                {row?.user?.email}
                             </p>
                         </div>
                     </div>
@@ -213,7 +213,9 @@ export const Advertisements
                             type="button"
                             className="px-3 py-1 text-sm border border-red-600 text-red-600 rounded-md hover:bg-red-50"
                             onClick={() => {
-                                setSelectedAd({ ad_id: row.crypto_ad_id, is_active: row.is_active });
+                                setSelectedAd({
+                                    ad_id: row.crypto_ad_id, is_active: row.is_active, action: row.is_active ? "disable" : "enable", // ✅ set action dynamically
+                                });
                                 setIsModalOpen(true); // modal kholne ke liye
                             }}
                         >
@@ -256,8 +258,11 @@ export const Advertisements
                         onClose={() => setIsModalOpen(false)}
                         onConfirm={handleConfirm}
                         title="Confirmation Alert!"
-                        message="Are you sure to disable this ad?"
-                    />
+                        message={
+                            selectedAd?.action === "disable"
+                                ? "Are you sure to disable this ad?"
+                                : "Are you sure to enable this ad?"
+                        } />
                     <DetailsModal
                         isOpen={isDetailsOpen}
                         onClose={() => setIsDetailsOpen(false)}

@@ -82,7 +82,6 @@ export const AllUsers: React.FC = () => {
         </div>
       ),
     },
-    { key: "email", label: "Email", sortable: true },
     { key: "country", label: "Country", sortable: true },
     { key: "user_status", label: "user_status", sortable: true },
     {

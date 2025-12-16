@@ -28,11 +28,14 @@ const Login: React.FC = () => {
   ) => {
     try {
       const res = await login(values.email, values.password);
-
       if (res.status) {
         showToast("success", res.message || "Login successful");
-        navigate("/");
-      } else {
+
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      }
+      else {
         showToast("error", res.message || "Login failed"); // 👈 backend का message
       }
     } catch (err: any) {
@@ -180,15 +183,7 @@ const Login: React.FC = () => {
                 </button>
 
                 {/* Sign up link */}
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
-                  Don’t have an account yet?{" "}
-                  <a
-                    href="/register"
-                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  >
-                    Sign up
-                  </a>
-                </p>
+
               </Form>
             )}
           </Formik>

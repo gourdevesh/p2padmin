@@ -71,12 +71,12 @@ const WebsideUpdateDetails: React.FC = () => {
         </button>
       </div>
 
-      <div className=" flex items-center justify-center mt-4 ">
-        <div className="bg-white shadow-lg rounded-lg w-full p-6 max-w-xxl">
+      <div className=" flex items-center justify-center mt-4  ">
+        <div className="bg-white shadow-lg rounded-lg w-full p-6 max-w-xxl dark:bg-gray-700 ">
 
-          <form onSubmit={formik.handleSubmit} className="space-y-5">
+          <form onSubmit={formik.handleSubmit} className="space-y-5 ">
             <div>
-              <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
+              <label htmlFor="name" className="block text-gray-700 dark:text-white  font-medium mb-1">
                 Name
               </label>
               <input
@@ -91,7 +91,7 @@ const WebsideUpdateDetails: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="url" className="block text-gray-700 font-medium mb-1">
+              <label htmlFor="url" className="block text-gray-700  dark:text-white font-medium mb-1">
                 URL
               </label>
               <input
@@ -106,7 +106,7 @@ const WebsideUpdateDetails: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="title" className="block text-gray-700 font-medium mb-1">
+              <label htmlFor="title" className="block text-gray-700  dark:text-white font-medium mb-1">
                 Title
               </label>
               <input

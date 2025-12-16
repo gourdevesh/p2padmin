@@ -58,7 +58,7 @@ export const DisputeDetail: React.FC = () => {
   const row = location.state?.row;
   console.log("rowdeatils", row)
   const tradeId = `tradeId:${row?.trade_details?.trade_id}`;
-console.log("tradeId22",tradeId)
+  console.log("tradeId22", tradeId)
   const dispute = {
     // Reporter → ticket बनाने वाला
     reporter: row?.reporter_details?.username || "Unknown",
@@ -259,7 +259,7 @@ console.log("tradeId22",tradeId)
     fetchData();
   }, []);
 
-    const sendSystemMessage = async (text: string) => {
+  const sendSystemMessage = async (text: string) => {
     if (!tradeId) return;
     try {
       const messageRef = collection(db, "UserToUserChats", tradeId, "messages");
@@ -279,7 +279,6 @@ console.log("tradeId22",tradeId)
     }
   };
 
-  console.log("messagehdss", messages)
 
   const requestEvidenceEmail = async () => {
     try {
@@ -371,12 +370,12 @@ console.log("tradeId22",tradeId)
                       Total: ₹{dispute.price}
                     </p>
 
-                  {dispute.result === "buyer" && (
-  <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-)}
-{dispute.result === "seller" && (
-  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-)}
+                    {dispute.result === "buyer" && (
+                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                    )}
+                    {dispute.result === "seller" && (
+                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                    )}
 
 
                   </div>
@@ -409,12 +408,12 @@ console.log("tradeId22",tradeId)
                       Total: ₹{dispute.price}
                     </p>
 
-                  {dispute.result === "seller" && (
-  <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
-)}
-{dispute.result === "buyer" && (
-  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
-)}
+                    {dispute.result === "seller" && (
+                      <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">Win</span>
+                    )}
+                    {dispute.result === "buyer" && (
+                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Lose</span>
+                    )}
 
                   </div>
                 </div>
@@ -434,7 +433,7 @@ console.log("tradeId22",tradeId)
               onClose={() => setOpenPredefinedModal(false)}
               userId={selectedUserId}
               tradeId={tradeId}
-trade_id={selectedTradeId ?? 0}             />
+              trade_id={selectedTradeId ?? 0} />
 
             {/* Trade ID & Release Button */}
             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mt-2 md:mt-0 md:justify-end">
@@ -667,7 +666,7 @@ trade_id={selectedTradeId ?? 0}             />
                     <span className="font-medium">
                       {msg.user?.firstName || "Unknown"}
                     </span>
-                    <span className="text-xs text-gray-900 ml-2">
+                    <span className="text-xs  ml-2 ">
                       {msg?.user?.role}
                     </span>
                   </div>
@@ -696,7 +695,7 @@ trade_id={selectedTradeId ?? 0}             />
                   {/* Timestamp */}
                   {msg?.createdAt && (
                     <div className="mt-1 text-right">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs ">
                         {new Date(msg.createdAt).toLocaleString([], {
                           day: "2-digit",
                           month: "2-digit",

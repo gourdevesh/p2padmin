@@ -76,7 +76,7 @@ const UpdateUserStatusModal: React.FC<UpdateUserStatusModalProps> = ({
         {/* Form Fields */}
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               User ID
             </label>
             <input
@@ -84,7 +84,7 @@ const UpdateUserStatusModal: React.FC<UpdateUserStatusModalProps> = ({
               value={userId}
               disabled
               className="w-full border rounded-md px-3 py-2 dark:bg-gray-700 dark:text-white"
-            />
+            /> */}
           </div>
 
           <div>

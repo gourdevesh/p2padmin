@@ -148,7 +148,6 @@ const UpdateAdmin: React.FC = () => {
                                             name="role"
                                             className="w-full p-2.5 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700"
                                         >
-                                            <option value="">Select role</option>
                                             <option value="admin">Admin</option>
                                             <option value="sub_admin">Sub-Admin</option>
                                         </Field>

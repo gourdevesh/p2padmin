@@ -52,7 +52,7 @@ const TradeHistory: React.FC = () => {
 
             const finalQuery = `page=${page}${query ? `&${query}` : ""}`;
             const data = await getTradeHistory(token, finalQuery);
-                                 setTradeData(data?.data || []);
+            setTradeData(data?.data || []);
 
             // if (data?.data) {
             //     const decrypted = await decryptData(data.data, token);
@@ -98,10 +98,14 @@ const TradeHistory: React.FC = () => {
     const columns = [
         { key: "trade_id", label: "Trade ID", sortable: true },
         {
-            key: "payment_user_id",
-            label: "User ID",
+            key: "seller_id",
+            label: "sellerid",
             sortable: true,
-            render: (value: any, row: TradeType) => row.payment?.payment_method?.payment_details?.user_id || "-"
+        },
+         {
+            key: "buyer_id",
+            label: "buyerid",
+            sortable: true,
         },
         { key: "trade_type", label: "Trade Type", sortable: true, render: (value: string | null) => value || "-" },
         { key: "asset", label: "Cryptocurrency", sortable: true },
@@ -155,26 +159,26 @@ const TradeHistory: React.FC = () => {
                 onSuccess={() => console.log("Trade completed!")}
                 selectedData={selectedData}
             />
-             <div className="flex flex-row items-center justify-between  flex-wrap">
-                    {/* Left side */}
-                    <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Trade History
-                    </h1>
-            
-                    {/* Right side */}
-                    <button
-                      onClick={() => navigate(-1)}
-                      className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
+            <div className="flex flex-row items-center justify-between  flex-wrap">
+                {/* Left side */}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Trade History
+                </h1>
+
+                {/* Right side */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 
                    text-gray-800 dark:text-gray-200 font-medium 
                    rounded-md shadow-sm border border-gray-300 dark:border-gray-600
                    hover:bg-gray-200 dark:hover:bg-gray-600 
                    transition-colors duration-200 focus:outline-none focus:ring-2 
                    focus:ring-blue-500 focus:ring-offset-1 justify-center text-sm"
-                    >
-                      <ArrowLeft className="mr-2 w-4 h-4" />
-                      Back
-                    </button>
-                  </div>
+                >
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    Back
+                </button>
+            </div>
 
 
             {/* Filters */}
@@ -185,7 +189,7 @@ const TradeHistory: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                     <input
                         type="text"
-                        placeholder="User ID"
+                        placeholder="sellerId/buyerId"
                         value={filters.user_id}
                         onChange={(e) => setFilters({ ...filters, user_id: e.target.value })}
                         className="p-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -227,8 +231,12 @@ const TradeHistory: React.FC = () => {
                         <option value="">Trade Status</option>
                         <option value="pending">Pending</option>
                         <option value="expired">Expired</option>
-                        <option value="completed">Completed</option>
-                        <option value="disputed">Disputed</option>
+                        <option value="success">success</option>
+                        <option value="processing">processing</option>
+                       <option value="cancel">cancel</option>
+                      <option value="reject">reject</option>
+
+
                     </select>
                     <button
                         onClick={handleFilter}

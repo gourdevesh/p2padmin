@@ -14,30 +14,50 @@ export const CloseTickets
         const [totalPages, setTotalPages] = useState(1);
         const [totalItems, setTotalItems] = useState(0);
         const navigate = useNavigate()
-        const fetchData = async (query: string = "", page: number = 1) => {
-            try {
-                setLoading(true);
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No auth token found");
-
-                // ✅ Page query ke andar hi bhejna
-                const finalQuery = `status=closed&page=${page}${query ? `&ticket_number=${query}` : ""
-                    }`;
-
-                const data = await getSupportTicket(token, finalQuery);
-
-                setPendingTickets(data?.data || []); // 💡 Poora object rakho
-
-                setCurrentPage(data?.pagination?.current_page || 1);
-                setTotalPages(data?.pagination?.last_page || 1);
-                setTotalItems(data?.pagination?.total_items || 0);
-            } catch (err: any) {
-                showToast("error", err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
+      const fetchData = async (query: string = "", page: number = 1) => {
+             try {
+                 setLoading(true);
+                 const token = localStorage.getItem("authToken");
+                 if (!token) throw new Error("No auth token found");
+         
+                 let finalQuery = `page=${page}`;
+         
+                 // Search input logic:
+                 if (query) {
+                     if (/^\d+$/.test(query)) {
+                         finalQuery += `&trade_id=${query}`;
+                     } else {
+                         finalQuery += `&ticket_number=${query}`;
+                     }
+                 }
+         
+                 
+         
+                 const data = await getSupportTicket(token, finalQuery);
+                 console.log("get-tickets", data);
+         
+                 // 🛑 If no results → Empty table
+                 if (!data.status || !data.data || data.data.length === 0) {
+                     setPendingTickets([]);          // CLEAR TABLE
+                     setTotalPages(1);
+                     setTotalItems(0);
+                     return;
+                 }
+         
+                 // 🟢 If results found
+                 setPendingTickets(data.data);
+                 setCurrentPage(data.pagination?.current_page || 1);
+                 setTotalPages(data.pagination?.last_page || 1);
+                 setTotalItems(data.pagination?.total || 0);
+         
+             } catch (err: any) {
+                 showToast("error", err.message);
+                 setPendingTickets([]); // ERROR par bhi table clear
+             } finally {
+                 setLoading(false);
+             }
+         };
+         
         useEffect(() => {
             fetchData(searchTerm, currentPage); // ✅ always pass page with query
         }, [currentPage]);
@@ -67,50 +87,50 @@ export const CloseTickets
                     </div>
                 ),
             },
-            {
-                key: "user_details",
+          {
+                key: "user",
                 label: "Submitted By",
                 sortable: true,
-                render: (value: any, row: any) => row?.user_details?.name ?? "N/A",
+                render: (value: any, row: any) => row?.reporter_details?.username ?? "N/A",
             },
-{
-  key: "status",
-  label: "Status",
-  sortable: true,
-  render: (value: string) => {
-    const status = (value || "unknown").toLowerCase(); // value yahi aata hai
-    let bgColor = "";
-    let textColor = "text-white";
+            {
+                key: "status",
+                label: "Status",
+                sortable: true,
+                render: (value: string) => {
+                    const status = (value || "unknown").toLowerCase(); // value yahi aata hai
+                    let bgColor = "";
+                    let textColor = "text-white";
 
-    switch (status) {
-      case "open":
-        bgColor = "bg-blue-500";
-        break;
-      case "pending":
-        bgColor = "bg-yellow-500";
-        break;
-      case "in-progress":
-        bgColor = "bg-purple-500";
-        break;
-      case "resolved":
-        bgColor = "bg-green-500";
-        break;
-      case "closed":
-        bgColor = "bg-red-500";
-        break;
-      default:
-        bgColor = "bg-gray-500";
-    }
+                    switch (status) {
+                        case "open":
+                            bgColor = "bg-blue-500";
+                            break;
+                        case "pending":
+                            bgColor = "bg-yellow-500";
+                            break;
+                        case "in-progress":
+                            bgColor = "bg-purple-500";
+                            break;
+                        case "resolved":
+                            bgColor = "bg-green-500";
+                            break;
+                        case "closed":
+                            bgColor = "bg-red-500";
+                            break;
+                        default:
+                            bgColor = "bg-gray-500";
+                    }
 
-    const displayText = status.charAt(0).toUpperCase() + status.slice(1);
+                    const displayText = status.charAt(0).toUpperCase() + status.slice(1);
 
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
-        {displayText}
-      </span>
-    );
-  },
-},
+                    return (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
+                            {displayText}
+                        </span>
+                    );
+                },
+            },
 
             {
                 key: "priority",
@@ -127,7 +147,7 @@ export const CloseTickets
                     <button
                         type="button"
                         className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-  onClick={() =>
+                        onClick={() =>
                             navigate(`/reply-ticket/${row.ticket_id}`, {
                                 state: { ticket_number: row.ticket_number },
                             })

@@ -63,6 +63,9 @@ import IdVerification from './pages/ManageUsers/IdVerification';
 import { UsersAddressVerifications } from './pages/ManageUsers/UserAddressVerifications';
 import { NewUserRegistration } from './pages/ManageUsers/NewUserRegistration';
 import UpdateAdmin from './pages/Admin/UpdateAdmin';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function AppRoutes() {
   const location = useLocation();
 
@@ -151,11 +154,10 @@ function AppRoutes() {
 function App() {
   return (
     <ThemeProvider>
-      <ToastProvider>
+        <ToastContainer />
         <AuthProvider>
           <AppRoutes />
         </AuthProvider>
-      </ToastProvider>
     </ThemeProvider>
   );
 }

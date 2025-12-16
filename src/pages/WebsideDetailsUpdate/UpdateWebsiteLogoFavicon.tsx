@@ -103,11 +103,11 @@ const UpdateWebsiteLogofavicon: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-xxl p-8 mt-4">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-xxl p-8 mt-4 dark:bg-gray-700">
         <form onSubmit={formik.handleSubmit} className="space-y-6">
           {/* Logo Upload */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Logo</label>
+            <label className="block text-gray-700 font-medium mb-2 dark:text-white ">Logo</label>
             <input
               type="file"
               accept="image/*"
@@ -128,7 +128,7 @@ const UpdateWebsiteLogofavicon: React.FC = () => {
 
           {/* favicon Upload */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">favicon</label>
+            <label className="block text-gray-700 font-medium mb-2 dark:text-white">favicon</label>
             <input
               type="file"
               accept="image/*"

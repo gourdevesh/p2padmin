@@ -15,15 +15,18 @@ export const VerificationDetails: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedData, setSelectedData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [country, setcountry] = useState("");
 
-  const fetchData = async (status: string = "", page: number = 1) => {
+  const fetchData = async (status: string = "", country: string = "", page: number = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
-
-      const finalQuery = `page=${page}${status ? `&status=${status}` : ""}`;
-      const data = await getVerificationDetails(token, finalQuery);
+  let query = `page=${page}`;
+      if (status) query += `&status=${status}`;
+      if (country) query += `&residence_country=${country}`;
+      // const finalQuery = `page=${page}${status ? `&status=${status}` : ""}`;
+      const data = await getVerificationDetails(token, query);
 
       setAddressDetails(data?.data || []);
       setCurrentPage(data?.pagination?.current_page || 1);
@@ -37,8 +40,9 @@ export const VerificationDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(statusFilter, currentPage);
-  }, [currentPage, statusFilter]);
+     fetchData(statusFilter, country, currentPage);
+   }, [currentPage, country, statusFilter]);
+ 
   const handleUpdateClick = (row: any) => {
     setSelectedData(row);
     setIsModalOpen(true);
@@ -54,6 +58,8 @@ export const VerificationDetails: React.FC = () => {
     { key: "user_id", label: "user Id", sortable: true },
     { key: "residence_State", label: "State", sortable: true },
     { key: "address_line1", label: "Address Line 1" },
+        { key: "residence_country", label: "Country", sortable: true },
+
     {
       key: "document_front_image",
       label: "Front Image",
@@ -118,17 +124,23 @@ export const VerificationDetails: React.FC = () => {
 
         {/* Status Filter */}
         <div className="flex items-center space-x-2">
-          <label
+        <label
             htmlFor="country"
             className="text-lg font-medium text-gray-700 dark:text-gray-300"
           >
             Country:
           </label>
           <select
+            id="country"
+            value={country} // bind value
+            onChange={(e) => {
+              setCurrentPage(1); // reset page on filter change
+              setcountry(e.target.value); // update country state
+            }}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="">All Countries</option>
-            <option value="India">India</option>
+            <option value="india">India</option>
             <option value="USA">USA</option>
             <option value="UK">UK</option>
           </select>

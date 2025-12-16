@@ -27,7 +27,7 @@ export const AssetsDetails: React.FC = () => {
         }`;
 
       const data = await getAssetsDetails(token, finalQuery);
-                            setAssetsDetails(data?.data || {});
+      setAssetsDetails(data?.data || {});
 
 
       //  if (data?.data) {
@@ -35,7 +35,7 @@ export const AssetsDetails: React.FC = () => {
       //                 setAssetsDetails(decrypted?.data || {});
       //             }
 
-     
+
       setCurrentPage(data?.pagination?.current_page || 1);
       setTotalPages(data?.pagination?.last_page || 1);
       setTotalItems(data?.pagination?.total_items || 0);
@@ -47,16 +47,17 @@ export const AssetsDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(searchTerm, currentPage); 
+    fetchData(searchTerm, currentPage);
   }, [currentPage]);
 
   const handleSearch = () => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
     fetchData(searchTerm, 1);
   };
 
 
   const columns = [
+
     {
       key: "	total_withdraw",
       label: "	total_withdraw",
@@ -66,29 +67,18 @@ export const AssetsDetails: React.FC = () => {
 
           <div className="ml-3">
             <p className="font-medium text-gray-900 dark:text-white">
-              {row?.name || row?.	total_withdraw}
+              {row?.name || row?.total_withdraw}
             </p>
-           
+
           </div>
         </div>
       ),
     },
     { key: "withdrawal_type", label: "withdrawal_type", sortable: true },
     { key: "status", label: "status", sortable: true },
-   
-    {
-      key: "actions",
-      label: "Actions",
-      render: (value: any, row: any) => (
-        <button
-          type="button"
-          className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none"
-        
-        >
-          Update
-        </button>
-      ),
-    },
+    { key: "asset", label: "asset", sortable: true },
+    { key: "total_deposit", label: "totaldeposit", sortable: true },
+
   ];
 
   return (
@@ -99,7 +89,7 @@ export const AssetsDetails: React.FC = () => {
           Assets Details
         </h1>
         <div className="flex items-center space-x-3">
-          <div className="flex flex-1">
+          {/* <div className="flex flex-1">
             <input
               type="text"
               placeholder=""
@@ -114,7 +104,7 @@ export const AssetsDetails: React.FC = () => {
             >
               <Search size={16} />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

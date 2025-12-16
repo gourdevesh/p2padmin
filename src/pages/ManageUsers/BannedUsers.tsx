@@ -69,11 +69,7 @@ export const BannedUsers
                 ),
             },
 
-            {
-                key: "email",
-                label: "Email",
-                sortable: true,
-            },
+           
             { key: "user_status", label: "user status", sortable: true },
 
             {

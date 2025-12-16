@@ -48,7 +48,7 @@ const PaymentDetails: React.FC = () => {
 
             const data = await getPaymentDetail(token, finalQuery);
 
-                             setPaymentDetail(data?.payment_details || {});
+            setPaymentDetail(data?.payment_details || {});
 
 
             // if (data?.payment_details) {
@@ -109,7 +109,17 @@ const PaymentDetails: React.FC = () => {
             label: "Account Number",
             sortable: true,
         },
-         {
+
+  {
+  key: "remark",
+  label: "Remark",
+  sortable: true,
+  render: (value: any) => value ?? "-"
+},
+
+
+
+        {
             key: "account_type",
             label: "account type",
             sortable: true,

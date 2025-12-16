@@ -14,6 +14,8 @@ import { getUserDetails, getUserDetailsbyId, updateUserNotification } from "../.
 import { showToast } from "../../utils/toast";
 import UpdateUserStatusModel from "../../Models/UpdateUserStatusModel";
 import NotificationModal from "../../Models/NotificationModal";
+import { useCryptoOption } from "../Store/cryptoOption";
+import { useCryptoOptions } from "../Store/cryptoOption2";
 
 
 type UserDetailParams = {
@@ -105,6 +107,7 @@ interface CryptoCardProps {
 }
 
 const CryptoCard: React.FC<CryptoCardProps> = ({
+
   symbol,
   balance,
   usdValue,
@@ -135,13 +138,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({
         }}
       />
       <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: "bold", fontSize: 16 }}>{balance}</div>
-        <div style={{ fontWeight: "bold", fontSize: 16 }}>({symbol})</div>
-        <div style={{ fontSize: 14, color: "#555" }}>Total balance</div>
+        {/* <div style={{ fontWeight: "bold", fontSize: 16 }}>{balance}</div> */}
+        <div style={{ fontWeight: "bold", fontSize: 16 }} className="dark:text-black" >({symbol})</div>
+        <div style={{ fontSize: 14, color: "#555" }}>Total balance :{balance}</div>
         <div style={{ fontSize: 14, color: "#555" }}>
           USD Value:{" "}
           <span style={{ color: "#3b3cff", fontWeight: "bold" }}>
-            ${usdValue.toFixed(2)}
+            {usdValue.toFixed(2)}
           </span>
         </div>
       </div>
@@ -184,6 +187,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
 
       const data = await getUserDetailsbyId(token, Number(user_id));
       setUser(data); // full response {status, message, data, analytics}
+
     } catch (err: any) {
       showToast("error", err.message || "Failed to load user details");
     } finally {
@@ -212,14 +216,6 @@ const UserDetail: React.FC<UserDetailProps> = ({
     country: userDetail?.user?.countryData?.country ?? "country",
   };
 
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    phone_number: Yup.string().required("Mobile number is required"),
-    country: Yup.string().required("Country is required"),
-  });
-
   const handleSubmit = (values: typeof initialValues) => {
     console.log("Form data", values);
   };
@@ -237,29 +233,29 @@ const UserDetail: React.FC<UserDetailProps> = ({
     setIsOpen(true);
     setSelectedData(userDetail?.user)
   };
-const StatusButton = ({ value }: { value: boolean }) => {
-  const isTrue = value === true;
+  const StatusButton = ({ value }: { value: boolean }) => {
+    const isTrue = value === true;
 
-  return (
-    <button
-      type="button"
-      className={`w-full py-3 text-white rounded-md relative
+    return (
+      <button
+        type="button"
+        className={`w-full py-3 text-white rounded-md relative
         ${isTrue ? "bg-green-500" : "bg-red-500"}
       `}
-    >
-      {isTrue ? "Verified" : "Unverified"}
+      >
+        {isTrue ? "Verified" : "Unverified"}
 
-      <span
-        className={`absolute top-0 right-0 h-full w-2 rounded-tr-md rounded-br-md
+        <span
+          className={`absolute top-0 right-0 h-full w-2 rounded-tr-md rounded-br-md
           ${isTrue
-            ? "bg-gradient-to-l from-green-700 to-green-500"
-            : "bg-gradient-to-l from-red-700 to-red-500"
-          }
+              ? "bg-gradient-to-l from-green-700 to-green-500"
+              : "bg-gradient-to-l from-red-700 to-red-500"
+            }
         `}
-      ></span>
-    </button>
-  );
-};
+        ></span>
+      </button>
+    );
+  };
 
   const token = localStorage.getItem("authToken");
 
@@ -285,8 +281,17 @@ const StatusButton = ({ value }: { value: boolean }) => {
       console.error("Error sending notification:", error);
     }
   };
-  console.log("User Detail Rendered:", userDetail);
-console.log("user?.data?.user",user?.data?.user)
+  const cryptoOption = useCryptoOption(Number(user_id));
+  const formattedCryptos = cryptoOption.map((item: any, index: number) => ({
+    id: String(index),              // ✅ MUST be string
+    symbol: item.shrotName,
+    balance: item.blc,
+    usdValue: Number(item.currentPrice),
+    name: item.name,
+    iconSrc: item.logo,
+  }));
+  console.log("formattedCryptos", formattedCryptos)
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
       <UpdateUserStatusModel
@@ -311,7 +316,7 @@ console.log("user?.data?.user",user?.data?.user)
         </h2>
         <button
           onClick={() => {
-            window.open(`http://localhost:5173/login?email=${encodeURIComponent( userDetail?.user?.email )}`, "_blank", "noopener,noreferrer");
+            window.open(`http://localhost:5173/login?email=${encodeURIComponent(userDetail?.user?.email)}`, "_blank", "noopener,noreferrer");
           }}
           className="border border-[#4b52ce] bg-white text-[#4b52ce] 
             px-4 py-1.5 rounded-md cursor-pointer 
@@ -334,28 +339,28 @@ console.log("user?.data?.user",user?.data?.user)
       >
         <SummaryCard
           title="Total Advertisements"
-          value={summary.advertisements}
+          value={user?.analytics?.TotalAdvertisements ?? 0}
           backgroundColor="#2e378c"
           iconBackgroundColor="#3c49b6"
           icon={<Megaphone size={27} color="white" />}
         />
         <SummaryCard
           title="Deposits"
-          value={summary.deposits}
+          value={user?.analytics?.deposits ?? 0}
           backgroundColor="#1a7670"
           iconBackgroundColor="#39c4bb"
           icon={<Wallet size={27} color="white" />}
         />
         <SummaryCard
           title="Withdrawals"
-          value={summary.withdrawals}
+          value={user?.analytics?.withdrawals ?? 0}
           backgroundColor="#a45b10"
           iconBackgroundColor="#fc8b2e"
           icon={<University size={27} color="white" />}
         />
         <SummaryCard
           title="Transactions"
-          value={summary.transactions}
+          value={user?.analytics?.Transactions ?? 0}
           backgroundColor="#004d81"
           iconBackgroundColor="#03579a"
           icon={<ArrowLeftRight size={27} color="white" />}
@@ -374,7 +379,7 @@ console.log("user?.data?.user",user?.data?.user)
           maxWidth: "1230px",
         }}
       >
-        {cryptos.map((crypto) => (
+        {formattedCryptos.map((crypto) => (
           <CryptoCard key={crypto.id} {...crypto} />
         ))}
 
@@ -468,7 +473,7 @@ console.log("user?.data?.user",user?.data?.user)
               {user?.data?.user?.user_status || "—"}
             </span>
           </div>
-
+          {/* 
           <div className="flex flex-col">
             <span className="font-semibold text-gray-600 dark:text-gray-300">Deposits</span>
             <span className="text-green-600 dark:text-green-400 font-medium">
@@ -481,20 +486,20 @@ console.log("user?.data?.user",user?.data?.user)
             <span className="text-red-500 dark:text-red-400 font-medium">
               {user?.analytics?.withdrawals ?? 0}
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
 
 
-      <div className=" mx-auto my-8 p-6 rounded-lg bg-white shadow-sm border border-gray-200">
-        <h2 className="text-xl font-semibold mb-6 text-gray-800">
-          Information of {userDetail?.username ?? ""}
+      <div className=" mx-auto my-8 p-6 rounded-lg bg-white  dark:bg-gray-800 shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
+          Information  {userDetail?.username ?? ""}
         </h2>
 
 
         <Formik
           initialValues={initialValues}
-          validationSchema={validationSchema}
+
           onSubmit={handleSubmit}
           enableReinitialize
 
@@ -502,45 +507,39 @@ console.log("user?.data?.user",user?.data?.user)
           {({ values, handleChange, }) => (
             <Form>
               {/* First and Last Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 ">
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="firstName">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="firstName ">
                     First Name <span className="text-red-600">*</span>
                   </label>
                   <Field
                     type="text"
                     id="firstName"
                     name="firstName"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                  <ErrorMessage
-                    name="firstName"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+                
                 </div>
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="lastName">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="lastName">
                     Last Name <span className="text-red-600">*</span>
                   </label>
                   <Field
                     type="text"
                     id="lastName"
                     name="lastName"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                  <ErrorMessage
-                    name="lastName"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+              
                 </div>
               </div>
 
               {/* Email and Mobile */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="email">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="email">
                     Email <span className="text-red-600">*</span>
                   </label>
                   <Field
@@ -548,125 +547,123 @@ console.log("user?.data?.user",user?.data?.user)
                     id="email"
                     name="email"
                     readOnly
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 bg-gray-100 cursor-not-allowed"
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 bg-gray-100 cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="phone_number">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="phone_number">
                     Mobile Number <span className="text-red-600">*</span>
                   </label>
                   <div className="flex">
-                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-200 text-gray-800 select-none">
+                    <span className=" dark:text-black inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-200 text-gray-800 select-none">
                       +
                     </span>
                     <Field
                       type="tel"
                       id="phone_number"
                       name="phone_number"
-                      className="flex-1 border border-gray-300 rounded-r-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      readOnly
+                      className="flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-r-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
-                  <ErrorMessage
-                    name="phone_number"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+              
                 </div>
               </div>
 
               {/* Address */}
               <div className="mb-6">
-                <label className="block mb-1 text-gray-700" htmlFor="address">
+                <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="address">
                   Address
                 </label>
                 <Field
                   type="text"
                   id="address"
                   name="address"
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  readOnly
+                  className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               {/* City, State, Zip/Postal, Country */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="city">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="city">
                     City
                   </label>
                   <Field
                     type="text"
                     id="city"
                     name="city"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="state">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="state">
                     State
                   </label>
                   <Field
                     type="text"
                     id="state"
                     name="state"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="zip">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="zip">
                     Zip/Postal
                   </label>
                   <Field
                     type="text"
                     id="zip"
                     name="zip"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-gray-700" htmlFor="country">
+                  <label className="block mb-1 text-gray-700 dark:text-white" htmlFor="country">
                     Country <span className="text-red-600">*</span>
                   </label>
                   <Field
                     as="select"
                     id="country"
                     name="country"
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    readOnly
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 rounded-md py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">Select country</option>
                     <option value="India">India</option>
                     <option value="USA">USA</option>
                     {/* Add more countries */}
                   </Field>
-                  <ErrorMessage
-                    name="country"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+            
                 </div>
               </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-  
-  <div>
-    <label className="block mb-2 text-gray-700">Email Verification</label>
-    <StatusButton value={user?.data?.user?.email_verified} />
-  </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
 
-  <div>
-    <label className="block mb-2 text-gray-700">Mobile Verification</label>
-    <StatusButton value={user?.data?.user?.phone_verified} />
-  </div>
+                <div>
+                  <label className="block mb-2 text-gray-700 dark:text-white">Email Verification</label>
+                  <StatusButton value={user?.data?.user?.email_verified} />
+                </div>
 
-  <div>
-    <label className="block mb-2 text-gray-700">2FA Verification</label>
-    <StatusButton value={user?.data?.user?.twoFactorAuth} />
-  </div>
+                <div>
+                  <label className="block mb-2 text-gray-700 dark:text-white">Mobile Verification</label>
+                  <StatusButton value={user?.data?.user?.phone_verified} />
+                </div>
 
-  <div>
-    <label className="block mb-2 text-gray-700">KYC</label>
-    <StatusButton value={user?.data?.user?.id_verified} />
-  </div>
+                <div>
+                  <label className="block mb-2 text-gray-700 dark:text-white">2FA Verification</label>
+                  <StatusButton value={user?.data?.user?.twoFactorAuth} />
+                </div>
 
-</div>
+                <div>
+                  <label className="block mb-2 text-gray-700 dark:text-white">KYC</label>
+                  <StatusButton value={user?.data?.user?.id_verified} />
+                </div>
+
+              </div>
 
 
               {/* Submit button */}

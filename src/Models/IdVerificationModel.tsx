@@ -93,7 +93,7 @@ const IdVerificationModel: React.FC<BankDetailsModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* ID */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Bank Detail ID
             </label>
@@ -103,7 +103,7 @@ const IdVerificationModel: React.FC<BankDetailsModalProps> = ({
               readOnly
               className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </div>
+          </div> */}
 
           {/* Status */}
           <div>

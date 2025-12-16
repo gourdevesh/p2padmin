@@ -62,7 +62,6 @@ const [loadingRowId, setLoadingRowId] = useState(null);
         setAnalytics(data);
 
     } catch (err: any) {
-        showToast("error", err.message);
         setPendingTickets([]); // ERROR par bhi table clear
     } finally {
         setLoading(false);

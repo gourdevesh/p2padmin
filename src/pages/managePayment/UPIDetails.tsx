@@ -101,6 +101,14 @@ const UPIDetails: React.FC = () => {
             label: "UPI ID",
             sortable: true,
         },
+  {
+  key: "remark",
+  label: "Remark",
+  sortable: true,
+  render: (value: any) => value ?? "-"
+},
+
+
           {
             key: "user_id",
             label: "user ID",

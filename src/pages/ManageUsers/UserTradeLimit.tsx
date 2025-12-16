@@ -31,11 +31,11 @@ Unverified User Limit: ₹${unverifiedLimit}`);
                     Back
                 </button>
             </div>
-            <div className="max-w-xxl mx-auto mt-5 bg-white rounded-2xl shadow-lg p-8">
+            <div className="max-w-xxl mx-auto mt-5 bg-white rounded-2xl shadow-lg p-8 dark:bg-gray-800">
 
                 {/* Unverified User Limit */}
                 <div className="mb-6">
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label className="block text-gray-700 font-medium mb-2 dark:text-white">
                         Unverified User Limit
                     </label>
                     <input
@@ -44,11 +44,11 @@ Unverified User Limit: ₹${unverifiedLimit}`);
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setUnverifiedLimit(Number(e.target.value))
                         }
-                        className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none"
+                        className="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white  border rounded-lg focus:ring focus:ring-indigo-300 focus:outline-none"
                     />
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 mt-1 dark:text-white">
                         Maximum trade  for users without ID verification:{" "}
-                        <span className="font-semibold text-indigo-600">
+                        <span className="font-semibold text-indigo-600 dark:text-white">
                             ₹{unverifiedLimit.toLocaleString("en-IN")}
                         </span>
                     </p>
@@ -58,9 +58,9 @@ Unverified User Limit: ₹${unverifiedLimit}`);
                 <div className="mb-6">
 
 
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 mt-1 dark:text-white">
                         Verified user limit:{" "}
-                        <span className="font-semibold text-indigo-600">
+                        <span className="font-semibold text-indigo-600 dark:text-white">
                             Unlimited
 
                         </span>

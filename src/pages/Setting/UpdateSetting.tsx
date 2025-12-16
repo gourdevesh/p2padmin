@@ -67,8 +67,11 @@ const UpdateSetting = () => {
       formData.append(key, value as any);
     });
 
-    await updateSettingData(token, formData);
-    showToast("success", "Settings updated successfully!");
+  const res = await updateSettingData(token, formData);
+if (res?.status) {
+  showToast("success", res.message || "Updated successfully");
+}
+  
 setTimeout(() => {
   navigate("/setting");
 }, 500);

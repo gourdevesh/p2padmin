@@ -253,7 +253,6 @@ const TransactionsDetails: React.FC = () => {
             key: "created_at",
             label: "Created At",
             sortable: true,
-            render: (value: string) => new Date(value).toLocaleString(),
         },
     ];
 
@@ -303,7 +302,7 @@ const TransactionsDetails: React.FC = () => {
                     >
                         <option value="">Txn Type</option>
                         <option value="internal">Internal</option>
-                        <option value="external">External</option>
+                        <option value="web3">web3</option>
                     </select>
                     <select
                         value={filters.asset}

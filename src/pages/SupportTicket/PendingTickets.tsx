@@ -14,27 +14,50 @@ export const PendingTickets
         const [totalPages, setTotalPages] = useState(1);
         const [totalItems, setTotalItems] = useState(0);
         const navigate = useNavigate()
-        const fetchData = async (query: string = "", page: number = 1) => {
-            try {
-                setLoading(true);
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No auth token found");
-                const finalQuery = `status=pending&page=${page}${query ? `&ticket_number=${query}` : ""
-                    }`;
-
-                const data = await getSupportTicket(token, finalQuery);
-
-                setPendingTickets(data?.data || []); // Poora object rakho
-
-                setCurrentPage(data?.pagination?.current_page || 1);
-                setTotalPages(data?.pagination?.last_page || 1);
-                setTotalItems(data?.pagination?.total_items || 0);
-            } catch (err: any) {
-                showToast("error", err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+         const fetchData = async (query: string = "", page: number = 1) => {
+                try {
+                    setLoading(true);
+                    const token = localStorage.getItem("authToken");
+                    if (!token) throw new Error("No auth token found");
+            
+                    let finalQuery = `page=${page}`;
+            
+                    // Search input logic:
+                    if (query) {
+                        if (/^\d+$/.test(query)) {
+                            finalQuery += `&trade_id=${query}`;
+                        } else {
+                            finalQuery += `&ticket_number=${query}`;
+                        }
+                    }
+            
+                    
+            
+                    const data = await getSupportTicket(token, finalQuery);
+                    console.log("get-tickets", data);
+            
+                    // 🛑 If no results → Empty table
+                    if (!data.status || !data.data || data.data.length === 0) {
+                        setPendingTickets([]);          // CLEAR TABLE
+                        setTotalPages(1);
+                        setTotalItems(0);
+                        return;
+                    }
+            
+                    // 🟢 If results found
+                    setPendingTickets(data.data);
+                    setCurrentPage(data.pagination?.current_page || 1);
+                    setTotalPages(data.pagination?.last_page || 1);
+                    setTotalItems(data.pagination?.total || 0);
+            
+                } catch (err: any) {
+                    showToast("error", err.message);
+                    setPendingTickets([]); // ERROR par bhi table clear
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
 
         useEffect(() => {
             fetchData(searchTerm, currentPage); //always pass page with query
@@ -66,10 +89,10 @@ export const PendingTickets
                 ),
             },
             {
-                key: "user_details",
+                key: "user",
                 label: "Submitted By",
                 sortable: true,
-                render: (value: any, row: any) => row?.user_details?.name ?? "N/A",
+                render: (value: any, row: any) => row?.reporter_details?.username ?? "N/A",
             },
             {
                 key: "status",
