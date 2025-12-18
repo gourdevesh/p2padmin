@@ -13,7 +13,7 @@ interface ReleaseCryptoModalProps {
 const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
   isOpen,
   onClose,
-  
+
   trade_id,
   buyerName,
 }) => {
@@ -38,7 +38,7 @@ const ReleaseCryptoModal: React.FC<ReleaseCryptoModalProps> = ({
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.message || "Something went wrong!");
+      toast.error(err?.response?.data?.message || err?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }

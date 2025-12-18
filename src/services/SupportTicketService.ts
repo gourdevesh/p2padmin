@@ -51,8 +51,6 @@ export const sendEvidenceRequired = async (payload: {
       },
     });
 
-    // response.data will contain whatever your backend sends, e.g.:
-    // { status: true, message: "Evidence required email sent successfully." }
     return response.data;
   } catch (error: any) {
     throw new Error(
