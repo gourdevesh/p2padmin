@@ -102,7 +102,7 @@ const TradeHistory: React.FC = () => {
             label: "sellerid",
             sortable: true,
         },
-         {
+        {
             key: "buyer_id",
             label: "buyerid",
             sortable: true,
@@ -233,8 +233,8 @@ const TradeHistory: React.FC = () => {
                         <option value="expired">Expired</option>
                         <option value="success">success</option>
                         <option value="processing">processing</option>
-                       <option value="cancel">cancel</option>
-                      <option value="reject">reject</option>
+                        <option value="cancel">cancel</option>
+                        <option value="reject">reject</option>
 
 
                     </select>

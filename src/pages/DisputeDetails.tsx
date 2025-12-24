@@ -12,7 +12,7 @@ import NewTradeModal from "../Models/NewTradeModal";
 import { cancelTrade } from "../services/TradeHistory";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useCryptoOptions } fm "./Store/cryptoOption2";
+import { useCryptoOptions } from "./Store/cryptoOption2";
 import { cancelTradeByAdmin, closeDisputeByAdmin, resertNewTrade, sendEvidenceRequired, sendSystemMessageAPI } from "../services/SupportTicketService";
 import ReleaseCryptoModal from "../Models/ReleaseCryptoModal";
 import { showToast } from "../utils/toast";
@@ -292,16 +292,16 @@ export const DisputeDetail: React.FC = () => {
       const data = await sendEvidenceRequired(payload); // axios call returns data directly
       console.log()
       if (data.status) {
-        showToast("success","Evidence request email sent successfully!")
+        showToast("success", "Evidence request email sent successfully!")
         await sendSystemMessage(
           "⚠️ Admin requested additional evidence for this dispute."
         );
       } else {
-      showToast("error",data.message);
+        showToast("error", data.message);
       }
     } catch (error: any) {
       console.error("Error sending evidence email:", error);
-     showToast("error", "Something went wrong");
+      showToast("error", "Something went wrong");
     }
     finally {
       setLoading(false); // stop loading
